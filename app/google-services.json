@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "991633786815",
+    "project_id": "foodapp-148519"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:991633786815:android:9fbd57ad0ec899cb",
+        "android_client_info": {
+          "package_name": "com.rtis.foodapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "991633786815-3ciqqupuu4fe5nkloi288geied01h8v0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rtis.foodapp",
+            "certificate_hash": "7402F3997A33577AC85D7F8414B793A8D21D2818"
+          }
+        },
+        {
+          "client_id": "991633786815-3jml8nrhvecfr99t64ok569a911q67r5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQDxuZneIhRcrj7vgpAjiq65dQgq1MPk0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

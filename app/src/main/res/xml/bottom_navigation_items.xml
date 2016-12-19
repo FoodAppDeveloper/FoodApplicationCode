@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tabs>
+    <tab
+        id="@+id/tab_today"
+        icon="@drawable/ic_today_black_24dp"
+        title="Today" />
+    <tab
+        id="@+id/tab_tips"
+        icon="@drawable/ic_note_black_24dp"
+        title="Tips" />
+    <tab
+        id="@+id/tab_coach"
+        icon="@drawable/ic_announcement_black_24dp"
+        title="Coach" />
+    <tab
+        id="@+id/tab_settings"
+        icon="@drawable/ic_settings_black_24dp"
+        title="Settings" />
+</tabs>
