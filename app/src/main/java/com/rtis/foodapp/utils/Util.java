@@ -23,7 +23,19 @@ public class Util {
     public static final int SATURDAY = 6;
     public static final int SUNDAY = 7;
 
+    public static final int BREAKFAST = 1;
+    public static final int MORNING_SNACK = 2;
+    public static final int LUNCH = 3;
+    public static final int AFTERNOON_SNACK = 4;
+    public static final int DINNER = 5;
+    public static final int EVENING_SNACK = 6;
 
+    public static final String BREAKFAST_STRING = "Breakfast";
+    public static final String MORNING_SNACK_STRING = "Snack (morning)";
+    public static final String LUNCH_STRING = "Lunch";
+    public static final String AFTERNOON_SNACK_STRING = "Snack (afternoon)";
+    public static final String DINNER_STRING = "Dinner";
+    public static final String EVENING_SNACK_STRING = "Snack (evening)";
 
     public static boolean isNetworkAvailable(Context ctx) {
         ConnectivityManager cm = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);

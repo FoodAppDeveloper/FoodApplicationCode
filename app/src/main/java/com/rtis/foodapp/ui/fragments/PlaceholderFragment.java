@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import com.rtis.foodapp.R;
 import com.rtis.foodapp.adapters.EveryDayMealTimingsListAdapter;
 import com.rtis.foodapp.model.MealTimeItems;
+import com.rtis.foodapp.utils.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,12 +52,12 @@ public  class PlaceholderFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_everyday_list, container, false);
         RecyclerView myList=(RecyclerView)rootView.findViewById(R.id.myList);
         mItems = new ArrayList<>();
-        mItems.add(new MealTimeItems(" item 1"));
-        mItems.add(new MealTimeItems(" item 2"));
-        mItems.add(new MealTimeItems(" item 3"));
-        mItems.add(new MealTimeItems(" item 4"));
-        mItems.add(new MealTimeItems(" item 5"));
-        mItems.add(new MealTimeItems(" item 6"));
+        mItems.add(new MealTimeItems(Util.BREAKFAST_STRING));
+        mItems.add(new MealTimeItems(Util.MORNING_SNACK_STRING));
+        mItems.add(new MealTimeItems(Util.LUNCH_STRING));
+        mItems.add(new MealTimeItems(Util.AFTERNOON_SNACK_STRING));
+        mItems.add(new MealTimeItems(Util.DINNER_STRING));
+        mItems.add(new MealTimeItems(Util.EVENING_SNACK_STRING));
 
         GridLayoutManager manager = new GridLayoutManager(getActivity(), 2);
         myList.setLayoutManager(manager);
