@@ -8,19 +8,20 @@ import android.net.NetworkInfo;
 import android.widget.Toast;
 
 import java.io.File;
+import java.text.DateFormatSymbols;
 
 /**
  * Created by admin on 2/12/16.
  */
 public class Util {
 
-    public static final int DAY1 = 1;
-    public static final int DAY2 = 2;
-    public static final int DAY3 = 3;
-    public static final int DAY4 = 4;
-    public static final int DAY5 = 5;
-    public static final int DAY6 = 6;
-    public static final int DAY7 = 7;
+    public static final int MONDAY = -1;
+    public static final int TUESDAY = 2;
+    public static final int WEDNESDAY = 3;
+    public static final int THURSDAY = 4;
+    public static final int FRIDAY = 5;
+    public static final int SATURDAY = 6;
+    public static final int SUNDAY = 7;
 
 
 
@@ -93,5 +94,6 @@ public class Util {
     {
         Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
     }
+
 
 }

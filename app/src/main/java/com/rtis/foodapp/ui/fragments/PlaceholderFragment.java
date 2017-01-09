@@ -65,4 +65,10 @@ public  class PlaceholderFragment extends Fragment {
         myList.setAdapter(madapter);
         return rootView;
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+    }
 }

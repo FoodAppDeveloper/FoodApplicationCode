@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="2dp"
     android:fitsSystemWindows="true"
     tools:context="com.rtis.foodapp.ui.MainActivity">
 
@@ -21,19 +20,22 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="60dp"
             app:swipe_descriptionGravity="center"
-            app:swipe_indicatorActiveColor="@color/colorPrimary"
-            app:swipe_indicatorInActiveColor="@color/colorPrimary"
+            app:swipe_indicatorActiveColor="@color/swipe_selector_active_color"
+            app:swipe_indicatorInActiveColor="@color/swipeselector_color_indicator_inactive"
             app:swipe_indicatorMargin="12dp"
             app:swipe_indicatorSize="10dp"
             app:swipe_leftButtonResource="@null"
-            app:swipe_rightButtonResource="@null">
+            app:swipe_rightButtonResource="@null"
+            app:swipe_titleTextAppearance="@style/AppTheme.SwipeTitleAppearance">
+
+            >
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginBottom="40dp"
-                android:layout_marginTop="70dp"
+                android:layout_marginTop="60dp"
                 android:background="#e5e7eb"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior" />
         </com.roughike.swipeselector.SwipeSelector>

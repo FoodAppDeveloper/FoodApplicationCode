@@ -4,4 +4,5 @@
     <color name="colorPrimaryDark">#00796B</color>
     <color name="colorAccent">#80CBC4</color>
     <color name="radioBackGround">#80CBC4</color>
+    <color name="swipe_selector_active_color">#009688</color>
 </resources>
