@@ -36,8 +36,21 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        // initialize the current week date values
         mDayNames = new DateFormatSymbols().getWeekdays();
+        ArrayList<String> swipeStrings = new ArrayList<>();
+        Calendar calendar = new GregorianCalendar();
+        Calendar currentDate = Calendar.getInstance(Locale.US);
+        calendar.setTime(currentDate.getTime());
+        int currentDay = calendar.get(Calendar.DAY_OF_WEEK);
+        for (int i = Calendar.SUNDAY; i <= Calendar.SATURDAY; i++) {
+            calendar.set(Calendar.DAY_OF_WEEK, i);
+            String eachDayString = mDayNames[calendar.get(Calendar.DAY_OF_WEEK)] + " " + calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.MONTH) + 1);
+            swipeStrings.add(eachDayString);
+            //Log.v("Day "," " +mDayNames[calendar.get(Calendar.DAY_OF_WEEK)] + " "+calendar.get(Calendar.DAY_OF_MONTH)+"/" + (calendar.get(Calendar.MONTH)+1));
+        }
+
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), swipeStrings);
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
@@ -60,17 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        ArrayList<String> swipeStrings = new ArrayList<>();
-        Calendar calendar = new GregorianCalendar();
-        Calendar currentDate = Calendar.getInstance(Locale.US);
-        calendar.setTime(currentDate.getTime());
-        int currentDay = calendar.get(Calendar.DAY_OF_WEEK);
-        for (int i = Calendar.SUNDAY; i <= Calendar.SATURDAY; i++) {
-            calendar.set(Calendar.DAY_OF_WEEK, i);
-            String eachDayString = mDayNames[calendar.get(Calendar.DAY_OF_WEEK)] + " " + calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.MONTH) + 1);
-            swipeStrings.add(eachDayString);
-            //Log.v("Day "," " +mDayNames[calendar.get(Calendar.DAY_OF_WEEK)] + " "+calendar.get(Calendar.DAY_OF_MONTH)+"/" + (calendar.get(Calendar.MONTH)+1));
-        }
+
 
         swipeSelector = (SwipeSelector) findViewById(R.id.conditionSelector);
         swipeSelector.setItems(

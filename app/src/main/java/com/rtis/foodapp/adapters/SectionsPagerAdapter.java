@@ -6,6 +6,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import com.rtis.foodapp.ui.fragments.PlaceholderFragment;
 
+import java.util.ArrayList;
+
 /**
  * Created by rajul on 11/18/2016.
  */
@@ -16,21 +18,28 @@ import com.rtis.foodapp.ui.fragments.PlaceholderFragment;
  */
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
+    private ArrayList<String> swipeStrings = null;
     public SectionsPagerAdapter(FragmentManager fm) {
         super(fm);
+    }
+
+    public SectionsPagerAdapter(FragmentManager fm, ArrayList<String> swipeStrings) {
+        super(fm);
+        this.swipeStrings = swipeStrings;
     }
 
     @Override
     public Fragment getItem(int position) {
         // getItem is called to instantiate the fragment for the given page.
         // Return a PlaceholderFragment (defined as a static inner class below).
-        return PlaceholderFragment.newInstance(position + 1);
+        //  return PlaceholderFragment.newInstance(position + 1);
+        return PlaceholderFragment.newInstance(swipeStrings.get(position));
     }
 
     @Override
     public int getCount() {
         // Show 3 total pages.
-        return 7;
+        return swipeStrings.size();
     }
 
     @Override
