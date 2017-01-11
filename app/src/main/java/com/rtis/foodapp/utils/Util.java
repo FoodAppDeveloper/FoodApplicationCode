@@ -8,7 +8,6 @@ import android.net.NetworkInfo;
 import android.widget.Toast;
 
 import java.io.File;
-import java.text.DateFormatSymbols;
 
 /**
  * Created by admin on 2/12/16.
