@@ -4,7 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.rtis.foodapp.ui.fragments.PlaceholderFragment;
+import com.rtis.foodapp.ui.fragments.EachDayFragment;
 
 import java.util.ArrayList;
 
@@ -31,14 +31,13 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         // getItem is called to instantiate the fragment for the given page.
-        // Return a PlaceholderFragment (defined as a static inner class below).
-        //  return PlaceholderFragment.newInstance(position + 1);
-        return PlaceholderFragment.newInstance(swipeStrings.get(position));
+        // Return a EachDayFragment (defined as a static inner class below).
+        //  return EachDayFragment.newInstance(position + 1);
+        return EachDayFragment.newInstance(swipeStrings.get(position));
     }
 
     @Override
     public int getCount() {
-        // Show 3 total pages.
         return swipeStrings.size();
     }
 

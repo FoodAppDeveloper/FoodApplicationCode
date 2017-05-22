@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.rtis.foodapp.R;
@@ -22,6 +23,7 @@ public class EveryDayMealTimingsListAdapter extends RecyclerView.Adapter<EveryDa
     private LayoutInflater mLayoutInflater;
 
     private List<MealTimeItems> mItems;
+    private EachItemHolder mCurrentHolder;
 
     public EveryDayMealTimingsListAdapter(Context context, List<MealTimeItems> items) {
         mContext = context;
@@ -29,7 +31,9 @@ public class EveryDayMealTimingsListAdapter extends RecyclerView.Adapter<EveryDa
         mItems = items;
     }
 
-
+    public EachItemHolder getmCurrentHolder() {
+        return mCurrentHolder;
+    }
 
     @Override
     public int getItemCount() {
@@ -43,7 +47,7 @@ public class EveryDayMealTimingsListAdapter extends RecyclerView.Adapter<EveryDa
         // work here if you need to control height of your items
         // keep in mind that parent is RecyclerView in this case
         int height = parent.getMeasuredHeight() / 3;
-        itemView.setMinimumHeight(height);
+        itemView.setMinimumHeight(height - 9);
         return new EachItemHolder(itemView);
 
     }
@@ -52,13 +56,16 @@ public class EveryDayMealTimingsListAdapter extends RecyclerView.Adapter<EveryDa
     public void onBindViewHolder(EachItemHolder holder, int position) {
         MealTimeItems item =  mItems.get(position);
         holder.txt_label.setText(item.getLabel());
+        mCurrentHolder = holder;
     }
 
-     static class EachItemHolder extends RecyclerView.ViewHolder {
-        TextView txt_label;
+    public static class EachItemHolder extends RecyclerView.ViewHolder {
+        public TextView txt_label;
+        public ImageView imageView;
         public EachItemHolder(View itemView) {
             super(itemView);
             txt_label = (TextView) itemView.findViewById(R.id.txt_label);
+            imageView = (ImageView) itemView.findViewById(R.id.eachMealImageView);
         }
 
     }

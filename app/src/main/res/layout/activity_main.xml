@@ -36,7 +36,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginBottom="40dp"
                 android:layout_marginTop="60dp"
-                android:background="#e5e7eb"
+                android:background="@color/white"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior" />
         </com.roughike.swipeselector.SwipeSelector>
 
