@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.0"
     defaultConfig {
         applicationId "com.rtis.foodapp"
         minSdkVersion 21
@@ -20,19 +19,25 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile files('libs/backendless.jar')
-    compile 'com.android.support:appcompat-v7:25.1.0'
-    compile 'com.android.support:design:25.1.0'
-    compile 'com.google.android.gms:play-services:9.8.0'
-    compile 'com.roughike:bottom-bar:2.0.2'
-    compile 'com.roughike:swipe-selector:1.0.6'
-    compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.android.support:support-v4:25.1.0'
-    testCompile 'junit:junit:4.12'
+    //implementation files('libs/backendless.jar')
+    implementation 'com.android.support:appcompat-v7:25.1.0'
+    implementation 'com.android.support:design:25.1.0'
+    implementation 'com.google.android.gms:play-services:9.8.0'
+    implementation 'com.roughike:bottom-bar:2.0.2'
+    implementation 'com.roughike:swipe-selector:1.0.6'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'com.android.support:support-v4:25.1.0'
+    testImplementation 'junit:junit:4.12'
+    implementation 'com.backendless:backendless:5.0.+'
+    // required for real-time database and real-time messaging
+    implementation('io.socket:socket.io-client:1.0.0') {
+        // excluding org.json which is provided by Android
+        exclude group: 'org.json', module: 'json'
+    }
 }
 
 

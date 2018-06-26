@@ -1,8 +1,8 @@
 package com.rtis.foodapp.backendless;
 
 public class Defaults {
-    public static final String APPLICATION_ID = "1E814AB3-A816-DE8D-FF72-CA7850EBB900";
-    public static final String SECRET_KEY = "3F14AA9E-379E-F856-FF42-A45837DEFC00";
+    public static final String APPLICATION_ID = "212C4FAA-5880-A76A-FF3C-9ACD99367F00";
+    public static final String API_KEY = "3F14AA9E-379E-F856-FF42-A45837DEFC00";
     public static final String VERSION = "v1";
     public static final String SERVER_URL = "https://api.backendless.com";
 
