@@ -167,7 +167,7 @@ public class SplashActivity extends AppCompatActivity {
                 else if (grantResults[2] == PackageManager.PERMISSION_DENIED && grantResults[1] == PackageManager.PERMISSION_GRANTED)
                     Toast.makeText(SplashActivity.this, "External Storage Access permission has been successfully invoked by the user, but Camera Access also needed by the app", Toast.LENGTH_SHORT).show();
             } else
-                Toast.makeText(this, "Camera And External Storage Access are required by this app to take advantage of all the functionalities.I f you want to revoke access, you have to do it from Settings", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Camera And External Storage Access are required by this app to take advantage of all the functionalities. If you want to revoke access, you have to do it from Settings", Toast.LENGTH_SHORT).show();
         }
     }
 }
