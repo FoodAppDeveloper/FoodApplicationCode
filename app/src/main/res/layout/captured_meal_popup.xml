@@ -1,0 +1,72 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/popup_1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <com.roughike.swipeselector.SwipeSelector
+        android:id="@+id/eachMealselector"
+        android:layout_width="match_parent"
+        android:layout_height="550dp"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="60dp"
+        app:swipe_descriptionGravity="center"
+        app:swipe_indicatorActiveColor="@color/swipe_selector_active_color"
+        app:swipe_indicatorInActiveColor="@color/swipeselector_color_indicator_inactive"
+        app:swipe_indicatorMargin="12dp"
+        app:swipe_indicatorSize="10dp"
+        app:swipe_leftButtonResource="@null"
+        app:swipe_rightButtonResource="@null"
+        android:padding="5dp"
+       >
+
+        <!--<ImageView
+            android:id="@+id/captured_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_marginBottom="60dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:scaleType="fitXY"
+            />-->
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/eachMealViewPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="40dp"
+            android:background="@color/white"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+           />
+
+        <!--<android.support.v7.widget.RecyclerView-->
+            <!--android:id="@+id/eachMealList"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_marginBottom="40dp"-->
+            <!--android:background="@color/white"-->
+           <!--/>-->
+    </com.roughike.swipeselector.SwipeSelector>
+
+    <!--<ImageView-->
+        <!--android:layout_width="300dp"-->
+        <!--android:layout_height="250dp"-->
+        <!--android:id="@+id/pop_imageView"-->
+        <!--android:scaleType="centerCrop"-->
+        <!--android:layout_centerInParent="true"-->
+       <!--/>-->
+
+    <ImageButton
+        android:id="@+id/close_popup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:src="@drawable/ic_close_dark"
+        />
+
+</RelativeLayout>
