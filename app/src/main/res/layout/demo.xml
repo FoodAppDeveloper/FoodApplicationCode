@@ -12,6 +12,7 @@
         android:padding="10dp">
 
         <ImageView
+            android:id="@+id/capturedImage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignParentTop="true"
@@ -19,8 +20,8 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginTop="10dp"
-            android:scaleType="fitXY"
-            android:src="@drawable/abcd" />
+            android:scaleType="fitXY" />
+            <!--android:src="@drawable/abcd" />-->
 
         <LinearLayout
             android:id="@+id/timeView"
@@ -35,7 +36,7 @@
             <TextView
                 android:id="@+id/timeTextView"
                 android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="11:39"
                 android:textSize="24sp" />
 

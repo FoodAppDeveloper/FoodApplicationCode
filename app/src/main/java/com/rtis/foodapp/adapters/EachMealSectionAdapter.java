@@ -7,18 +7,24 @@ import android.os.Bundle;
 import android.support.annotation.IntegerRes;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.rtis.foodapp.R;
+import com.rtis.foodapp.ui.fragments.TimePickerFragment;
+import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.sql.Time;
 import java.util.Calendar;
 
 /**
@@ -30,10 +36,18 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
     private final FragmentManager fragmentManager;
     private Context mContext;
     private TextView timeTextView=null;
+    private File imageFile;
+    private ImageView mImageView;
+    private String timeText;
+    //private TimePickerFragment timeFragment;
 
-    public EachMealSectionAdapter(Context context, FragmentManager fm) {
+    private final String HOUR = "Hour";
+    private final String MINUTE = "Minute";
+
+    public EachMealSectionAdapter(Context context, FragmentManager fm, File file) {
         mContext = context;
         fragmentManager=fm;
+        imageFile = file;
     }
 
     @Override
@@ -43,28 +57,62 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
         ViewGroup layout = (ViewGroup) inflater.inflate(R.layout.demo, collection, false);
         collection.addView(layout);
         timeTextView=(TextView)layout.findViewById(R.id.timeTextView);
+
+
         final Calendar c = Calendar.getInstance();
         int hour = c.get(Calendar.HOUR_OF_DAY);
         int minute = c.get(Calendar.MINUTE);
         setTime(hour,minute);
-        LinearLayout timeView=(LinearLayout)layout.findViewById(R.id.timeView);
+
+        LinearLayout timeView = (LinearLayout)layout.findViewById(R.id.timeView);
+
         timeView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                // Log.v("TimeView","Time View clicked");
-                // TimePickerFragment newFragment = new TimePickerFragment();
-              //  newFragment.show(fragmentManager,"TimePicker");
-                timeTextView=(TextView) view.findViewById(R.id.timeTextView);
+                //timeFragment = new TimePickerFragment();
+                //timeFragment.show(fragmentManager,"TimePicker");
+
+                //timeText = timeFragment.getTimeSet();
+                timeTextView = (TextView) view.findViewById(R.id.timeTextView);
+                //timeTextView.setText(timeText);
+
                 final Calendar c = Calendar.getInstance();
                 int hour = c.get(Calendar.HOUR_OF_DAY);
                 int minute = c.get(Calendar.MINUTE);
 
                 //Create and return a new instance of TimePickerDialog
-                TimePickerDialog tm= new TimePickerDialog(mContext, EachMealSectionAdapter.this, hour, minute,
+                TimePickerDialog tm = new TimePickerDialog(mContext, EachMealSectionAdapter.this, hour, minute,
                         DateFormat.is24HourFormat(mContext));
                 tm.show();
+
+                /*
+                Bundle bundle = new Bundle();
+                bundle.putInt(HOUR, hour);
+                bundle.putInt(MINUTE, minute);
+                TimePickerFragment timeFragment = new TimePickerFragment();
+                timeFragment.setArguments(bundle);
+                FragmentTransaction transaction = fragmentManager.beginTransaction();
+                transaction.add(timeFragment, "TimePicker");
+                transaction.commit();
+
+                timeText = timeFragment.getTimeSet();
+                timeTextView.setText(timeText);*/
             }
         });
+
+        /*if (timeFragment != null) {
+            timeText = timeFragment.getTimeSet();
+            timeTextView.setText(timeText);
+        }*/
+
+        mImageView = (ImageView) layout.findViewById(R.id.capturedImage);
+        if (imageFile != null) {
+            Picasso.with(mContext).load(imageFile).into(mImageView);
+        } else {
+            // take photo button?
+        }
+
         return layout;
     }
 
@@ -75,7 +123,7 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
 
     @Override
     public int getCount() {
-        return 3;
+        return 2;
     }
 
     @Override
@@ -114,9 +162,9 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
         }
     }
 
+
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-
         setTime(hourOfDay,minute);
     }
 

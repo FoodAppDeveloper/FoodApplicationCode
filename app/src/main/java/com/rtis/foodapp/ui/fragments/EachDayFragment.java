@@ -5,6 +5,7 @@ package com.rtis.foodapp.ui.fragments;
  */
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 
@@ -34,6 +36,7 @@ import com.rtis.foodapp.callbacks.ItemClickSupport;
 import com.rtis.foodapp.model.MealTimeItems;
 import com.rtis.foodapp.utils.ItemOffsetDecoration;
 import com.rtis.foodapp.utils.Util;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,6 +67,7 @@ public class EachDayFragment extends Fragment {
     private File photoFile;
     private ViewPager mViewPager;
     private SwipeSelector swipeSelector;
+    private ImageView mImageView;
 
     public EachDayFragment() {
     }
@@ -118,6 +122,7 @@ public class EachDayFragment extends Fragment {
         ItemClickSupport.addTo(myList).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+                // Position is recorded as position of selected meal in List
                 Log.v("EachList", mCurrentPageName + " " + position);
                 dispatchTakePictureIntent(position);
             }
@@ -130,6 +135,8 @@ public class EachDayFragment extends Fragment {
         super.onResume();
     }
 
+    /* Deal with camera */
+
     private void dispatchTakePictureIntent(int clickedItemPosition) {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
@@ -137,7 +144,7 @@ public class EachDayFragment extends Fragment {
             // Create the File where the photo should go
             photoFile = null;
             try {
-                photoFile = createImageFile();
+                photoFile = createImageFile(clickedItemPosition);
             } catch (IOException ex) {
                 // Error occurred while creating the File
             }
@@ -152,19 +159,20 @@ public class EachDayFragment extends Fragment {
         }
     }
 
-    private File createImageFile() throws IOException {
+    private File createImageFile(int position) throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
+        String imageFileName = "JPEG_" + timeStamp + "_" + position + "_";
         File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
+                imageFileName,   /* prefix */
+                ".jpg",   /* suffix */
                 storageDir      /* directory */
         );
 
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoPath = image.getAbsolutePath();
+        galleryAddPic();
         return image;
     }
 
@@ -173,9 +181,17 @@ public class EachDayFragment extends Fragment {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             showPopUp();
             //  extras.getInt("Position");
+
+            /* crashes with below code */
+            //Bundle extras = data.getExtras();
+            //Bitmap imageBitmap = (Bitmap) extras.get("data");
+            //mImageView.setImageBitmap(imageBitmap);
         }
     }
 
+    /**
+     * Add current photo path to internal storage. Doesn't show up in gallery.
+     */
     private void galleryAddPic() {
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         File f = new File(mCurrentPhotoPath);
@@ -206,7 +222,8 @@ public class EachDayFragment extends Fragment {
         }
 
         swipeSelector = (SwipeSelector) customView.findViewById(R.id.eachMealselector);
-        swipeSelector.setItems(new SwipeItem(0, "Some", "SomeH"), new SwipeItem(1, "Some2", "SomeH"), new SwipeItem(2, "Some3", "SomeH"));
+        swipeSelector.setItems(new SwipeItem(0, "Some", "SomeH"),
+                new SwipeItem(0, "Some2", "SomeI"));
 
         // Get a reference for the custom view close button
         ImageButton closeButton = (ImageButton) customView.findViewById(R.id.close_popup);
@@ -217,10 +234,10 @@ public class EachDayFragment extends Fragment {
 //        myList.setLayoutManager(horizontalLayoutManagaer);
 //        myList.setAdapter(new EachMealRecylerAdapter(getContext()));
 
-        //  ImageView popUpImageView=(ImageView) customView.findViewById(R.id.pop_imageView);
+        //ImageView popUpImageView=(ImageView) customView.findViewById(R.id.pop_imageView);
         mViewPager = (ViewPager) customView.findViewById(R.id.eachMealViewPager);
 
-        mViewPager.setAdapter(new EachMealSectionAdapter(getContext(), getChildFragmentManager()));
+        mViewPager.setAdapter(new EachMealSectionAdapter(getContext(), getChildFragmentManager(), photoFile));
 
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -230,7 +247,7 @@ public class EachDayFragment extends Fragment {
 
             @Override
             public void onPageSelected(int position) {
-                //Log.v("Slider","Page Selected to "+position);
+                Log.v("Slider","Page Selected to "+position);
                 swipeSelector.selectItemAt(position);
             }
 
@@ -240,11 +257,13 @@ public class EachDayFragment extends Fragment {
             }
         });
 
-        if (photoFile != null) {
-            // Picasso.with(getActivity()).load(photoFile).into(popUpImageView);
-            photoFile.delete();
-        }
-        //  setPic(popUpImageView);
+        // reset photoFile
+        //if (photoFile != null) {
+            //Picasso.with(getActivity()).load(photoFile).into(popUpImageView);
+            //photoFile.delete();
+        //}
+        //setPic(popUpImageView);
+
         // Set a click listener for the popup window close button
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
