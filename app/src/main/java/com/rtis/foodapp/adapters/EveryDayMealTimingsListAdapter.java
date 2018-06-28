@@ -1,5 +1,6 @@
 package com.rtis.foodapp.adapters;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -39,7 +40,6 @@ public class EveryDayMealTimingsListAdapter extends RecyclerView.Adapter<EveryDa
     public int getItemCount() {
         return mItems.size();
     }
-
 
     @Override
     public EachItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {

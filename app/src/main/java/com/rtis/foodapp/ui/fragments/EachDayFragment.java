@@ -13,6 +13,8 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.GridLayoutManager;
@@ -45,6 +47,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import java.lang.IllegalStateException;
+
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
@@ -68,6 +72,8 @@ public class EachDayFragment extends Fragment {
     private ViewPager mViewPager;
     private SwipeSelector swipeSelector;
     private ImageView mImageView;
+
+    private List<EachMealFragment> mealFragments;
 
     public EachDayFragment() {
     }
@@ -104,12 +110,12 @@ public class EachDayFragment extends Fragment {
         mRelativeLayout = (RelativeLayout) rootView.findViewById(R.id.fragment_relativeLayout);
         RecyclerView myList = (RecyclerView) rootView.findViewById(R.id.myList);
         mItems = new ArrayList<>();
-        mItems.add(new MealTimeItems(Util.BREAKFAST_STRING));
-        mItems.add(new MealTimeItems(Util.MORNING_SNACK_STRING));
-        mItems.add(new MealTimeItems(Util.LUNCH_STRING));
-        mItems.add(new MealTimeItems(Util.AFTERNOON_SNACK_STRING));
-        mItems.add(new MealTimeItems(Util.DINNER_STRING));
-        mItems.add(new MealTimeItems(Util.EVENING_SNACK_STRING));
+        mItems.add(new MealTimeItems(Util.BREAKFAST_STRING));           // 0
+        mItems.add(new MealTimeItems(Util.MORNING_SNACK_STRING));       // 1
+        mItems.add(new MealTimeItems(Util.LUNCH_STRING));               // 2
+        mItems.add(new MealTimeItems(Util.AFTERNOON_SNACK_STRING));     // 3
+        mItems.add(new MealTimeItems(Util.DINNER_STRING));              // 4
+        mItems.add(new MealTimeItems(Util.EVENING_SNACK_STRING));       // 5
 
         GridLayoutManager manager = new GridLayoutManager(getActivity(), 2);
 
@@ -119,12 +125,34 @@ public class EachDayFragment extends Fragment {
         madapter = new EveryDayMealTimingsListAdapter(getContext(), mItems);
         myList.setAdapter(madapter);
 
+        mealFragments = new ArrayList<>();
+        mealFragments.add(EachMealFragment.newInstance(Util.BREAKFAST_FILE));
+        mealFragments.add(EachMealFragment.newInstance(Util.MORNING_SNACK_FILE));
+        mealFragments.add(EachMealFragment.newInstance(Util.LUNCH_FILE));
+        mealFragments.add(EachMealFragment.newInstance(Util.AFTERNOON_SNACK_FILE));
+        mealFragments.add(EachMealFragment.newInstance(Util.DINNER_FILE));
+        mealFragments.add(EachMealFragment.newInstance(Util.EVENING_SNACK_FILE));
+
         ItemClickSupport.addTo(myList).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
                 // Position is recorded as position of selected meal in List
                 Log.v("EachList", mCurrentPageName + " " + position);
-                dispatchTakePictureIntent(position);
+                //dispatchTakePictureIntent(position);
+                //mealFragments.get(position).mealClicked();
+
+                if (!mealFragments.get(position).isAdded()) {
+                    getActivity().getSupportFragmentManager().beginTransaction()
+                            .add(mealFragments.get(position), "meal_fragment")
+                            .addToBackStack(null)
+                            .commit();
+                } else {
+                    mealFragments.get(position).mealClicked();
+                    /*getActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.popup_1, mealFragments.get(position))
+                            .addToBackStack(null)
+                            .commit();*/
+                }
             }
         });
         return rootView;
@@ -135,145 +163,4 @@ public class EachDayFragment extends Fragment {
         super.onResume();
     }
 
-    /* Deal with camera */
-
-    private void dispatchTakePictureIntent(int clickedItemPosition) {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-            // Create the File where the photo should go
-            photoFile = null;
-            try {
-                photoFile = createImageFile(clickedItemPosition);
-            } catch (IOException ex) {
-                // Error occurred while creating the File
-            }
-            // Continue only if the File was successfully created
-            if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(getActivity(),
-                        "com.rtis.foodapp.fileprovider",
-                        photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-            }
-        }
-    }
-
-    private File createImageFile(int position) throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_" + position + "_";
-        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,   /* prefix */
-                ".jpg",   /* suffix */
-                storageDir      /* directory */
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
-        galleryAddPic();
-        return image;
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            showPopUp();
-            //  extras.getInt("Position");
-
-            /* crashes with below code */
-            //Bundle extras = data.getExtras();
-            //Bitmap imageBitmap = (Bitmap) extras.get("data");
-            //mImageView.setImageBitmap(imageBitmap);
-        }
-    }
-
-    /**
-     * Add current photo path to internal storage. Doesn't show up in gallery.
-     */
-    private void galleryAddPic() {
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        File f = new File(mCurrentPhotoPath);
-        Uri contentUri = Uri.fromFile(f);
-        mediaScanIntent.setData(contentUri);
-        getActivity().sendBroadcast(mediaScanIntent);
-    }
-
-
-    private void showPopUp() {
-        // Initialize a new instance of LayoutInflater service
-        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(LAYOUT_INFLATER_SERVICE);
-
-        // Inflate the custom layout/view
-        View customView = inflater.inflate(R.layout.captured_meal_popup, null);
-
-        // Initialize a new instance of popup window
-        mPopupWindow = new PopupWindow(
-                customView,
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT, true
-        );
-
-        // Set an elevation value for popup window
-        // Call requires API level 21
-        if (Build.VERSION.SDK_INT >= 21) {
-            mPopupWindow.setElevation(5.0f);
-        }
-
-        swipeSelector = (SwipeSelector) customView.findViewById(R.id.eachMealselector);
-        swipeSelector.setItems(new SwipeItem(0, "Some", "SomeH"),
-                new SwipeItem(0, "Some2", "SomeI"));
-
-        // Get a reference for the custom view close button
-        ImageButton closeButton = (ImageButton) customView.findViewById(R.id.close_popup);
-        RelativeLayout mLayout = (RelativeLayout) customView.findViewById(R.id.popup_1);
-//        RecyclerView myList = (RecyclerView) customView.findViewById(R.id.eachMealList);
-//        LinearLayoutManager horizontalLayoutManagaer
-//                = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
-//        myList.setLayoutManager(horizontalLayoutManagaer);
-//        myList.setAdapter(new EachMealRecylerAdapter(getContext()));
-
-        //ImageView popUpImageView=(ImageView) customView.findViewById(R.id.pop_imageView);
-        mViewPager = (ViewPager) customView.findViewById(R.id.eachMealViewPager);
-
-        mViewPager.setAdapter(new EachMealSectionAdapter(getContext(), getChildFragmentManager(), photoFile));
-
-        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                Log.v("Slider","Page Selected to "+position);
-                swipeSelector.selectItemAt(position);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-
-        // reset photoFile
-        //if (photoFile != null) {
-            //Picasso.with(getActivity()).load(photoFile).into(popUpImageView);
-            //photoFile.delete();
-        //}
-        //setPic(popUpImageView);
-
-        // Set a click listener for the popup window close button
-        closeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Dismiss the popup window
-                mPopupWindow.dismiss();
-            }
-        });
-
-        mPopupWindow.showAtLocation(mRelativeLayout, Gravity.CENTER, 0, 0);
-
-    }
 }

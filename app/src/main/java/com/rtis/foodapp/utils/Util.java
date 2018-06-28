@@ -14,7 +14,7 @@ import java.io.File;
  */
 public class Util {
 
-    public static final int MONDAY = -1;
+    public static final int MONDAY = 1;
     public static final int TUESDAY = 2;
     public static final int WEDNESDAY = 3;
     public static final int THURSDAY = 4;
@@ -35,6 +35,13 @@ public class Util {
     public static final String AFTERNOON_SNACK_STRING = "Snack (afternoon)";
     public static final String DINNER_STRING = "Dinner";
     public static final String EVENING_SNACK_STRING = "Snack (evening)";
+
+    public static final String BREAKFAST_FILE = "b";
+    public static final String MORNING_SNACK_FILE = "ms";
+    public static final String LUNCH_FILE = "l";
+    public static final String AFTERNOON_SNACK_FILE = "as";
+    public static final String DINNER_FILE = "d";
+    public static final String EVENING_SNACK_FILE = "es";
 
     public static boolean isNetworkAvailable(Context ctx) {
         ConnectivityManager cm = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.IntegerRes;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
@@ -20,12 +21,15 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.rtis.foodapp.R;
+import com.rtis.foodapp.ui.fragments.EachMealFragment;
 import com.rtis.foodapp.ui.fragments.TimePickerFragment;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * Created by rajul on 1/14/2017.
@@ -33,21 +37,23 @@ import java.util.Calendar;
 
 public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDialog.OnTimeSetListener {
 
-    private final FragmentManager fragmentManager;
+    //private final FragmentManager fragmentManager;
     private Context mContext;
     private TextView timeTextView=null;
+    private List<File> imageFiles;
     private File imageFile;
     private ImageView mImageView;
     private String timeText;
+    private List<String> times;
     //private TimePickerFragment timeFragment;
 
     private final String HOUR = "Hour";
     private final String MINUTE = "Minute";
 
-    public EachMealSectionAdapter(Context context, FragmentManager fm, File file) {
+    public EachMealSectionAdapter(Context context, List<File> files) {
         mContext = context;
-        fragmentManager=fm;
-        imageFile = file;
+        imageFiles = files;
+        times = new ArrayList<>();
     }
 
     @Override
@@ -57,6 +63,7 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
         ViewGroup layout = (ViewGroup) inflater.inflate(R.layout.demo, collection, false);
         collection.addView(layout);
         timeTextView=(TextView)layout.findViewById(R.id.timeTextView);
+
 
 
         final Calendar c = Calendar.getInstance();
@@ -107,8 +114,8 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
         }*/
 
         mImageView = (ImageView) layout.findViewById(R.id.capturedImage);
-        if (imageFile != null) {
-            Picasso.with(mContext).load(imageFile).into(mImageView);
+        if (imageFiles.size() > 0) {
+            Picasso.with(mContext).load(imageFiles.get(position)).into(mImageView);
         } else {
             // take photo button?
         }
@@ -123,7 +130,7 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
 
     @Override
     public int getCount() {
-        return 2;
+        return imageFiles.size();
     }
 
     @Override
