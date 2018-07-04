@@ -6,8 +6,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
@@ -17,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 
@@ -25,14 +22,17 @@ import com.roughike.swipeselector.SwipeItem;
 import com.roughike.swipeselector.SwipeSelector;
 import com.rtis.foodapp.R;
 import com.rtis.foodapp.adapters.EachMealSectionAdapter;
-import com.rtis.foodapp.adapters.EveryDayMealTimingsListAdapter;
+import com.rtis.foodapp.model.ImageText;
+import com.rtis.foodapp.utils.Util;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
@@ -42,9 +42,10 @@ public class EachMealFragment extends Fragment {
 
     private String mCurrentPhotoPath;
     private PopupWindow mPopupWindow;
-    private List<File> imageFiles;
     private ViewPager mViewPager;
     private SwipeSelector swipeSelector;
+
+    private List<ImageText> imageTextList;
 
     private EachMealSectionAdapter mAdapter;
 
@@ -80,18 +81,17 @@ public class EachMealFragment extends Fragment {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             //day = getArguments().getString(ARG_DAY);
             meal = getArguments().getString(ARG_MEAL);
         }
-        imageFiles = new ArrayList<>();
+        imageTextList = new ArrayList<>();
+
+        if (savedInstanceState != null) {
+            imageTextList = savedInstanceState.getParcelableArrayList("imageTextFiles");
+        }
     }
 
     @Override
@@ -100,7 +100,7 @@ public class EachMealFragment extends Fragment {
 
         View customView = inflater.inflate(R.layout.captured_meal_popup, container, false);
 
-        if (imageFiles.isEmpty()) {
+        if (imageTextList.isEmpty()) {
             dispatchTakePictureIntent();
         } else {
             showPopUp();
@@ -115,81 +115,13 @@ public class EachMealFragment extends Fragment {
     }
 
     public void mealClicked() {
-        if (imageFiles.isEmpty()) {
+        if (imageTextList.isEmpty()) {
             dispatchTakePictureIntent();
         } else {
             showPopUp();
         }
     }
 
-    /* Deal with Camera */
-
-    public void dispatchTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-            // Create the File where the photo should go
-            File photoFile = null;
-            try {
-                photoFile = createImageFile();
-                imageFiles.add(photoFile);
-            } catch (IOException ex) {
-                // Error occurred while creating the File
-            }
-            // Continue only if the File was successfully created
-            if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(getActivity(),
-                        "com.rtis.foodapp.fileprovider",
-                        photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-            }
-        }
-    };
-
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_" + meal + "_";
-        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,   /* prefix */
-                ".jpg",   /* suffix */
-                storageDir      /* directory */
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
-        galleryAddPic();
-        return image;
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            showPopUp();
-
-            //  extras.getInt("Position");
-
-            /* crashes with below code */
-            //Bundle extras = data.getExtras();
-            //Bitmap imageBitmap = (Bitmap) extras.get("data");
-            //mImageView.setImageBitmap(imageBitmap);
-        }
-    }
-
-    /**
-     * Add current photo path to internal storage. Doesn't show up in gallery.
-     */
-    private void galleryAddPic() {
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        File f = new File(mCurrentPhotoPath);
-        Uri contentUri = Uri.fromFile(f);
-        mediaScanIntent.setData(contentUri);
-        getActivity().sendBroadcast(mediaScanIntent);
-    }
-
-    // otherwise have this called on onCreateView
     private void showPopUp() {
         // Initialize a new instance of LayoutInflater service
         LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -211,8 +143,8 @@ public class EachMealFragment extends Fragment {
         }
 
         swipeSelector = (SwipeSelector) customView.findViewById(R.id.eachMealselector);
-        SwipeItem[] swipeItems = new SwipeItem[imageFiles.size()];
-        for (int i = 0; i < imageFiles.size(); i++) {
+        SwipeItem[] swipeItems = new SwipeItem[imageTextList.size()];
+        for (int i = 0; i < imageTextList.size(); i++) {
             swipeItems[i] = new SwipeItem(i, "Image" + i, "Image" + i);
         }
         swipeSelector.setItems(swipeItems);
@@ -231,7 +163,7 @@ public class EachMealFragment extends Fragment {
         //ImageView popUpImageView=(ImageView) customView.findViewById(R.id.pop_imageView);
         mViewPager = (ViewPager) customView.findViewById(R.id.eachMealViewPager);
 
-        mViewPager.setAdapter(new EachMealSectionAdapter(getContext(), imageFiles));
+        mViewPager.setAdapter(new EachMealSectionAdapter(getContext(), imageTextList, meal));
 
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -267,6 +199,81 @@ public class EachMealFragment extends Fragment {
 
         mPopupWindow.showAtLocation(mLayout, Gravity.CENTER, 0, 0);
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("imageTextFiles", (ArrayList) imageTextList);
+    }
+
+    /* Deal with Camera */
+
+    public void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+
+                ImageText temp = new ImageText();
+                temp.setImageFile(mCurrentPhotoPath);
+                imageTextList.add(temp);
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+                Util.showToast(getContext(), "Image failed to save.");
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(getActivity(),
+                        "com.rtis.foodapp.fileprovider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            }
+        }
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_" + meal + "_";
+        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,   /* prefix */
+                ".jpg",   /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        galleryAddPic();
+        return image;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            showPopUp();
+
+            /* crashes with below code */
+            //Bundle extras = data.getExtras();
+            //Bitmap imageBitmap = (Bitmap) extras.get("data");
+            //mImageView.setImageBitmap(imageBitmap);
+        }
+    }
+
+    /**
+     * Add current photo path to internal storage. Doesn't show up in gallery.
+     */
+    private void galleryAddPic() {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(mCurrentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        getActivity().sendBroadcast(mediaScanIntent);
     }
 
 }

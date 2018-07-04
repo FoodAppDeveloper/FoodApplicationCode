@@ -2,4 +2,6 @@
 <paths>
     <external-path name="my_images"
         path="Android/data/com.rtis.foodapp/files/Pictures" />
+    <external-path name="my_texts"
+        path="Android/data/com.rtis.foodapp/files/Texts" />
 </paths>

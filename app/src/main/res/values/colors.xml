@@ -5,5 +5,5 @@
     <color name="colorAccent">#80CBC4</color>
     <color name="radioBackGround">#80CBC4</color>
     <color name="swipe_selector_active_color">#009688</color>
-    <color name="white">#FFFFFF</color>
+    <color name="white">#ffffff</color>
 </resources>
