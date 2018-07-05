@@ -33,6 +33,7 @@ dependencies {
     implementation 'com.android.support:support-v4:25.1.0'
     testImplementation 'junit:junit:4.12'
     implementation 'com.backendless:backendless:5.0.+'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     // required for real-time database and real-time messaging
     implementation('io.socket:socket.io-client:1.0.0') {
         // excluding org.json which is provided by Android
@@ -40,5 +41,8 @@ dependencies {
     }
 }
 
+repositories {
+    google()
+}
 
 apply plugin: 'com.google.gms.google-services'

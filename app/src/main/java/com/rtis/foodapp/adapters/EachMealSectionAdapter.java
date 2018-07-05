@@ -1,10 +1,13 @@
 package com.rtis.foodapp.adapters;
 
+import android.app.Activity;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.view.PagerAdapter;
+import android.text.InputType;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Gravity;
@@ -13,6 +16,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -122,6 +127,7 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
             timeTextView.setText(timeText);
         }*/
 
+        final View v = layout.getRootView();
         ImageButton editButton = (ImageButton) layout.findViewById(R.id.edit_button);
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -199,8 +205,8 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
             mPopupWindow.setElevation(5.0f);
         }
 
-        RelativeLayout mLayout = (RelativeLayout) customView.findViewById(R.id.popup_2);
-        EditText textView = (EditText) customView.findViewById(R.id.description);
+        ConstraintLayout mLayout = (ConstraintLayout) customView.findViewById(R.id.popup_2);
+        final EditText textView = (EditText) customView.findViewById(R.id.description);
 
         // if file exists, show text
         if (!imageTextList.get(position).isTextEmpty()) {
@@ -212,6 +218,7 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
                 String line;
                 while((line = br.readLine()) != null) {
                     data.append(line);
+                    data.append("\n");
                 }
             } catch (IOException e) {
                 Util.showToast(mContext, "Text failed to open.");
@@ -220,49 +227,47 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
             textView.setText(data);
         }
 
-        textView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        Button doneButton = (Button) customView.findViewById(R.id.doneButton);
+        doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                boolean handled = false;
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    mPopupWindow.dismiss();
-                    handled = true;
-                    String data = v.getText().toString();
+            public void onClick(View view) {
+                // Dismiss the popup window
+                mPopupWindow.dismiss();
 
-                    if (imageTextList.get(position).isTextEmpty()) {
-                        File storageDir = mContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+                // Save text to file
+                String data = textView.getText().toString();
 
-                        String image = imageTextList.get(position).getImageFile();
-                        String imageName = image.substring(image.indexOf("JPEG_") + 5, image.length() - 4);
+                if (imageTextList.get(position).isTextEmpty()) {
+                    File storageDir = mContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
 
-                        String fileName = "TXT_" + imageName + ".txt";
-                        try {
-                            File file = new File(storageDir, fileName);
-                            FileWriter writer = new FileWriter(file);
-                            writer.append(data);
-                            writer.flush();
-                            writer.close();
+                    String image = imageTextList.get(position).getImageFile();
+                    String imageName = image.substring(image.indexOf("JPEG_") + 5, image.length() - 4);
 
-                            imageTextList.get(position).setTextFile(file.getAbsolutePath());
+                    String fileName = "TXT_" + imageName + ".txt";
+                    try {
+                        File file = new File(storageDir, fileName);
+                        FileWriter writer = new FileWriter(file);
+                        writer.append(data);
+                        writer.flush();
+                        writer.close();
 
-                        } catch (IOException e) {
-                            Util.showToast(mContext, "Text failed to save.");
-                        }
-                    } else {
-                        try {
-                            File file = new File(imageTextList.get(position).getTextFile());
-                            FileWriter writer = new FileWriter(file);
-                            writer.append(data);
-                            writer.flush();
-                            writer.close();
-                        } catch (IOException e) {
-                            Util.showToast(mContext, "Text failed to save.");
-                        }
+                        imageTextList.get(position).setTextFile(file.getAbsolutePath());
 
+                    } catch (IOException e) {
+                        Util.showToast(mContext, "Text failed to save.");
+                    }
+                } else {
+                    try {
+                        File file = new File(imageTextList.get(position).getTextFile());
+                        FileWriter writer = new FileWriter(file);
+                        writer.append(data);
+                        writer.flush();
+                        writer.close();
+                    } catch (IOException e) {
+                        Util.showToast(mContext, "Text failed to save.");
                     }
 
                 }
-                return handled;
             }
         });
 
