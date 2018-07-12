@@ -22,6 +22,7 @@ import com.backendless.async.callback.BackendlessCallback;
 import com.backendless.exceptions.BackendlessFault;
 import com.rtis.foodapp.R;
 import com.rtis.foodapp.backendless.Defaults;
+import com.rtis.foodapp.model.ImageText;
 import com.rtis.foodapp.utils.Logger;
 import com.rtis.foodapp.utils.Util;
 
@@ -67,6 +68,8 @@ public class SplashActivity extends AppCompatActivity {
         }
         Logger.v("Splash init end");
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+
+        Backendless.Data.mapTableToClass("FoodData", ImageText.class);
     }
 
     @Override

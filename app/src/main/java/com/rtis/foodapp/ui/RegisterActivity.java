@@ -262,10 +262,6 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
-
-
-
-
     private void registrationCompleted()
     {
         Intent loginIntent=new Intent(RegisterActivity.this, LoginActivity.class);
@@ -278,7 +274,8 @@ public class RegisterActivity extends AppCompatActivity {
     void displayImage() {
         ContentResolver contentResolver = this.getContentResolver();
         try {
-            uploadImageBitmap = Util.scaleDown(MediaStore.Images.Media.getBitmap(contentResolver, imageUri), 300, true);
+            uploadImageBitmap = Util.scaleDown(MediaStore.Images.Media.getBitmap(contentResolver,
+                    imageUri), 300, true);
             if (uploadImageBitmap != null) {
                 uploadImageView.setImageBitmap(uploadImageBitmap);
                 isProfilePicAvailable = true;
@@ -291,7 +288,10 @@ public class RegisterActivity extends AppCompatActivity {
     private void uploadProfilePic(final String imageName)
     {
         // testing file upload
-        Backendless.Files.Android.upload(uploadImageBitmap, Bitmap.CompressFormat.PNG, 100,imageName+".png", Defaults.FILES_PROFILE_PIC_DIRECTORY, new AsyncCallback<BackendlessFile>() {
+        Backendless.Files.Android.upload(uploadImageBitmap, Bitmap.CompressFormat.PNG, 100,
+                imageName+".png", Defaults.FILES_PROFILE_PIC_DIRECTORY,
+                new AsyncCallback<BackendlessFile>() {
+
             @Override
             public void handleResponse(final BackendlessFile backendlessFile) {
                 Logger.v(" Profile Pic Url " + backendlessFile.getFileURL());
@@ -301,7 +301,8 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void handleFault(BackendlessFault backendlessFault) {
 
-                Toast.makeText(RegisterActivity.this, backendlessFault.toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(RegisterActivity.this, backendlessFault.toString(),
+                        Toast.LENGTH_SHORT).show();
                 Logger.v(" Profile Pic Upload Failed fault " +  backendlessFault.toString());
                 Logger.v(" Profile Pic Upload Failed " + backendlessFault.getDetail());
                 Logger.v(" Profile Pic Upload Failed message " + backendlessFault.getMessage());

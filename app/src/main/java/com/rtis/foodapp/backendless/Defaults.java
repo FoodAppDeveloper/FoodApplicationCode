@@ -26,4 +26,6 @@ public class Defaults {
 
     public static final String FILES_PROFILE_PIC_DIRECTORY = "profilePics";
     public static final String FILES_PROFILE_PIC_URL = SERVER_URL + "/" + APPLICATION_ID + "/" + VERSION + "/files/" + FILES_PROFILE_PIC_DIRECTORY;
+
+    public static final String FILES_IMAGETEXT_DIRECTORY = "imageText";
 }

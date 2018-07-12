@@ -1,6 +1,8 @@
 package com.rtis.foodapp.ui.fragments;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,11 +20,19 @@ import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 
+import com.backendless.Backendless;
+import com.backendless.BackendlessUser;
+import com.backendless.async.callback.AsyncCallback;
+import com.backendless.exceptions.BackendlessFault;
+import com.backendless.files.BackendlessFile;
 import com.roughike.swipeselector.SwipeItem;
 import com.roughike.swipeselector.SwipeSelector;
 import com.rtis.foodapp.R;
 import com.rtis.foodapp.adapters.EachMealSectionAdapter;
+import com.rtis.foodapp.backendless.Defaults;
+import com.rtis.foodapp.model.FoodAppUser;
 import com.rtis.foodapp.model.ImageText;
+import com.rtis.foodapp.utils.Logger;
 import com.rtis.foodapp.utils.Util;
 
 import java.io.File;
@@ -30,9 +40,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
@@ -40,10 +48,12 @@ import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 public class EachMealFragment extends Fragment {
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
-    private String mCurrentPhotoPath;
+    private String mCurrentFileName;
+    private String mCurrentPhotoPath = "null";
     private PopupWindow mPopupWindow;
     private ViewPager mViewPager;
     private SwipeSelector swipeSelector;
+    Uri mCurrentPhotoUri;
 
     private List<ImageText> imageTextList;
 
@@ -92,6 +102,7 @@ public class EachMealFragment extends Fragment {
         if (savedInstanceState != null) {
             imageTextList = savedInstanceState.getParcelableArrayList("imageTextFiles");
         }
+
     }
 
     @Override
@@ -211,6 +222,8 @@ public class EachMealFragment extends Fragment {
 
     public void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        //takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, getUriForCamera());
+        //startActivityForResult(takePictureIntent, Defaults.CAMERA_RESULT_CODE);
         // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
             // Create the File where the photo should go
@@ -218,9 +231,6 @@ public class EachMealFragment extends Fragment {
             try {
                 photoFile = createImageFile();
 
-                ImageText temp = new ImageText();
-                temp.setImageFile(mCurrentPhotoPath);
-                imageTextList.add(temp);
             } catch (IOException ex) {
                 // Error occurred while creating the File
                 Util.showToast(getContext(), "Image failed to save.");
@@ -230,8 +240,14 @@ public class EachMealFragment extends Fragment {
                 Uri photoURI = FileProvider.getUriForFile(getActivity(),
                         "com.rtis.foodapp.fileprovider",
                         photoFile);
+                mCurrentPhotoUri = photoURI;
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+
+                //Bundle extras = takePictureIntent.getExtras();
+                //Bitmap imageBitmap = (Bitmap) extras.get("data");
+
+                //uploadImage(photoURI);
             }
         }
     }
@@ -240,6 +256,7 @@ public class EachMealFragment extends Fragment {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_" + meal + "_";
+        mCurrentFileName = imageFileName;
         File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
                 imageFileName,   /* prefix */
@@ -250,19 +267,69 @@ public class EachMealFragment extends Fragment {
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoPath = image.getAbsolutePath();
         galleryAddPic();
+
         return image;
     }
 
+    // Gets called after dispatchTakePictureIntent
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            showPopUp();
+            ImageText temp = new ImageText();
 
-            /* crashes with below code */
-            //Bundle extras = data.getExtras();
-            //Bitmap imageBitmap = (Bitmap) extras.get("data");
-            //mImageView.setImageBitmap(imageBitmap);
+            try {
+                Bitmap imageBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), mCurrentPhotoUri);
+                temp.uploadImageFile(mCurrentFileName, imageBitmap);
+                //uploadImage(imageBitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            temp.setImageFile(mCurrentPhotoPath);
+            imageTextList.add(temp);
+
+            showPopUp();
         }
+    }
+
+    private void uploadImage(Bitmap imageBitmap) {
+        Backendless.Files.Android.upload(imageBitmap, Bitmap.CompressFormat.JPEG, 100,
+                mCurrentFileName + ".jpg", Defaults.FILES_IMAGETEXT_DIRECTORY,
+                new AsyncCallback<BackendlessFile>() {
+
+                    @Override
+                    public void handleResponse(final BackendlessFile backendlessFile) {
+                        Logger.v(" Food Image Url " + backendlessFile.getFileURL());
+                    }
+
+                    @Override
+                    public void handleFault(BackendlessFault backendlessFault) {
+                        Logger.v(" Image Upload Failed fault " + backendlessFault.toString());
+                        Logger.v(" Image Upload Failed " + backendlessFault.getDetail());
+                        Logger.v(" Image Upload Failed message " + backendlessFault.getMessage());
+                    }
+
+                });
+    }
+
+    private void saveImageText(ImageText it) {
+
+        FoodAppUser user = (FoodAppUser) Backendless.UserService.CurrentUser();
+        List<ImageText> itList = user.getImageTextList();
+        itList.add(it);
+        user.setProperty("FoodData", itList);
+        Backendless.Data.of(BackendlessUser.class).save(user, new AsyncCallback<BackendlessUser>() {
+            public void handleResponse( BackendlessUser response )
+            {
+                // new Contact instance has been saved
+            }
+
+            public void handleFault( BackendlessFault fault )
+            {
+                Logger.v(" ImageText failed to save message " + fault.getMessage());
+            }
+        });
     }
 
     /**
