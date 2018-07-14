@@ -28,8 +28,15 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.backendless.Backendless;
+import com.backendless.async.callback.AsyncCallback;
+import com.backendless.exceptions.BackendlessFault;
+import com.backendless.files.BackendlessFile;
+import com.backendless.files.BackendlessFileFactory;
 import com.rtis.foodapp.R;
+import com.rtis.foodapp.backendless.Defaults;
 import com.rtis.foodapp.model.ImageText;
+import com.rtis.foodapp.utils.Logger;
 import com.rtis.foodapp.utils.Util;
 import com.squareup.picasso.Picasso;
 
@@ -61,6 +68,7 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
     private List<String> times;
     private String meal_name;
     private List<ImageText> imageTextList;
+    private File mCurrentFile;
 
     private final String HOUR = "Hour";
     private final String MINUTE = "Minute";
@@ -139,6 +147,7 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
 
         mImageView = (ImageView) layout.findViewById(R.id.capturedImage);
         if (imageTextList.size() > 0) {
+            //query image file here
             File image = new File(imageTextList.get(position).getImageFile());
             Picasso.with(mContext).load(image).into(mImageView);
         }
@@ -237,20 +246,22 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
                 // Save text to file
                 String data = textView.getText().toString();
 
+                String image = imageTextList.get(position).getImageFile();
+                String imageName = image.substring(image.indexOf("JPEG_") + 5, image.length() - 4);
+
+                String fileName = "TXT_" + imageName + ".txt";
+
                 if (imageTextList.get(position).isTextEmpty()) {
                     File storageDir = mContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
 
-                    String image = imageTextList.get(position).getImageFile();
-                    String imageName = image.substring(image.indexOf("JPEG_") + 5, image.length() - 4);
-
-                    String fileName = "TXT_" + imageName + ".txt";
                     try {
                         File file = new File(storageDir, fileName);
                         FileWriter writer = new FileWriter(file);
                         writer.append(data);
                         writer.flush();
                         writer.close();
-
+                        mCurrentFile = file;
+                        uploadTextFile(position);
                         imageTextList.get(position).setTextFile(file.getAbsolutePath());
 
                     } catch (IOException e) {
@@ -263,6 +274,10 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
                         writer.append(data);
                         writer.flush();
                         writer.close();
+                        mCurrentFile = file;
+
+                        uploadTextFile(position);
+
                     } catch (IOException e) {
                         Util.showToast(mContext, "Text failed to save.");
                     }
@@ -272,7 +287,29 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
         });
 
         mPopupWindow.showAtLocation(mLayout, Gravity.CENTER, 0, 0);
+    }
 
+    private void uploadTextFile(final int position) {
+        Backendless.Files.upload(mCurrentFile, Defaults.FILES_IMAGETEXT_DIRECTORY, true,
+                new AsyncCallback<BackendlessFile>() {
+            @Override
+            public void handleResponse(final BackendlessFile backendlessFile) {
+                ImageText imageText = imageTextList.get(position);
+                imageText.setTextFile(backendlessFile.getFileURL());
+                Logger.v(" Text File Url " + backendlessFile.getFileURL());
+                imageTextList.set(position, imageText);
+                ImageText.saveImageText(imageText);
+                mCurrentFile.delete();
+            }
+
+            @Override
+            public void handleFault(BackendlessFault backendlessFault) {
+                Logger.v(" Text Upload Failed fault " + backendlessFault.toString());
+                Logger.v(" Text Upload Failed " + backendlessFault.getDetail());
+                Logger.v(" Text Upload Failed message " + backendlessFault.getMessage());
+            }
+
+        });
     }
 
 }

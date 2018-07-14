@@ -7,6 +7,7 @@ import android.os.Parcelable;
 import android.widget.Toast;
 
 import com.backendless.Backendless;
+import com.backendless.BackendlessUser;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.files.BackendlessFile;
@@ -15,7 +16,9 @@ import com.rtis.foodapp.ui.RegisterActivity;
 import com.rtis.foodapp.ui.fragments.EachMealFragment;
 import com.rtis.foodapp.utils.Logger;
 
+import java.io.File;
 import java.net.URI;
+import java.util.Date;
 
 import weborb.service.MapToProperty;
 
@@ -25,13 +28,10 @@ import weborb.service.MapToProperty;
  */
 public class ImageText implements Parcelable {
 
-    @MapToProperty(property = "image")
     private String imageFile;
-
-    @MapToProperty(property = "text")
     private String textFile;
-
-    private Uri imageUri;
+    private String meal;
+    private String fragmentDate;
 
     public int describeContents() {
         return 0;
@@ -63,11 +63,32 @@ public class ImageText implements Parcelable {
         textFile = "";
     }
 
+    public ImageText(String meal, String date) {
+        imageFile = "";
+        textFile = "";
+        this.meal = meal;
+        this.fragmentDate = date;
+    }
+
+    public void setMeal(String meal) {
+        this.meal = meal;
+    }
+
+    public String getMeal(){
+        return meal;
+    }
+
+    public void setDate(String date) {
+        fragmentDate = date;
+    }
+
+    public String getFragmentDate() {
+        return fragmentDate;
+    }
+
     public boolean isTextEmpty() {
-        if (textFile.isEmpty() || textFile.equals("")) {
-            return true;
-        }
-        return false;
+        return (textFile.isEmpty() || textFile.equals(""));
+
     }
 
     public String getImageFile() {
@@ -85,17 +106,29 @@ public class ImageText implements Parcelable {
     public void setTextFile(String file) {
         textFile = file;
     }
-
+/*
     public void uploadImageFile(final String fileName, Bitmap bitmapImage) {
-
-
+        final ImageText it = this;
         Backendless.Files.Android.upload(bitmapImage, Bitmap.CompressFormat.JPEG, 100,
                 fileName + ".jpg", Defaults.FILES_IMAGETEXT_DIRECTORY,
                 new AsyncCallback<BackendlessFile>() {
 
                 @Override
                 public void handleResponse(final BackendlessFile backendlessFile) {
-                    Logger.v(" Profile Pic Url " + backendlessFile.getFileURL());
+                    it.image = backendlessFile;
+                    Logger.v(" Image File Url " + backendlessFile.getFileURL());
+
+                    Backendless.Persistence.of(ImageText.class).save(it, new AsyncCallback<ImageText>() {
+                        @Override
+                        public void handleResponse(ImageText response) {
+                            Logger.v(" ImageText object saved ");
+                        }
+
+                        @Override
+                        public void handleFault(BackendlessFault fault) {
+                            Logger.v(" ImageText Save Failed: " + fault.getMessage());
+                        }
+                    });
                 }
 
                 @Override
@@ -105,6 +138,52 @@ public class ImageText implements Parcelable {
                     Logger.v(" Image Upload Failed message " + backendlessFault.getMessage());
                 }
 
+        });
+    }
+
+    public void uploadTextFile(File textFile) {
+        final ImageText it = this;
+        Backendless.Files.upload(textFile, Defaults.FILES_IMAGETEXT_DIRECTORY, true, new AsyncCallback<BackendlessFile> () {
+                @Override
+                public void handleResponse(final BackendlessFile backendlessFile) {
+                    text = backendlessFile;
+                    Logger.v(" Text File Url " + backendlessFile.getFileURL());
+
+                    Backendless.Persistence.of(ImageText.class).save(it, new AsyncCallback<ImageText>() {
+                        @Override
+                        public void handleResponse(ImageText response) {
+                            Logger.v(" ImageText object saved ");
+                        }
+
+                        @Override
+                        public void handleFault(BackendlessFault fault) {
+                            Logger.v(" ImageText Save Failed: " + fault.getMessage());
+                        }
+                    });
+                }
+
+                @Override
+                public void handleFault(BackendlessFault backendlessFault) {
+                    Logger.v(" Text Upload Failed fault " +  backendlessFault.toString());
+                    Logger.v(" Text Upload Failed " + backendlessFault.getDetail());
+                    Logger.v(" Text Upload Failed message " + backendlessFault.getMessage());
+                }
+
+        });
+
+    }*/
+
+    public static void saveImageText(ImageText it) {
+        Backendless.Persistence.save(it, new AsyncCallback<ImageText>() {
+            @Override
+            public void handleResponse(ImageText response) {
+                Logger.v(" ImageText object saved ");
+            }
+
+            @Override
+            public void handleFault(BackendlessFault fault) {
+                Logger.v(" ImageText Save Failed: " + fault.getMessage());
+            }
         });
     }
 }

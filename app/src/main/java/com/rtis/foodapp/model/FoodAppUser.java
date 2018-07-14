@@ -10,13 +10,10 @@ public class FoodAppUser extends BackendlessUser {
     private final String KEY_NAME = "name";
     private final String KEY_PHONO = "phno";
     private final String KEY_IS_PROFILE_PIC_AVAILABLE = "isProfilePicAvailable";
-    private final String KEY_IMAGETEXT = "FoodData";
-    private List<ImageText> imageTextList;
 
    public FoodAppUser()
     {
         // default constructor
-        imageTextList = new ArrayList<>();
     }
 
     public FoodAppUser(BackendlessUser user)
@@ -29,26 +26,6 @@ public class FoodAppUser extends BackendlessUser {
         setPhoneNumber((String) user.getProperty(KEY_PHONO));
         setIsProfilePicAvailable((Boolean) user.getProperty(KEY_IS_PROFILE_PIC_AVAILABLE));
 
-        setImageTextList(getImageTextList(user));
-    }
-
-    public List<ImageText> getImageTextList(BackendlessUser user) {
-        List<ImageText> list = new ArrayList<>();
-        Object imageTextObject = user.getProperty(KEY_IMAGETEXT);
-        if ((imageTextObject != null) && (imageTextObject instanceof ImageText[]))
-        {
-            ImageText[] imageTexts = (ImageText[]) imageTextObject;
-            list.addAll(Arrays.asList(imageTexts));
-        }
-        return list;
-    }
-
-    public List<ImageText> getImageTextList() {
-       return imageTextList;
-    }
-
-    public void setImageTextList(List<ImageText> imageTextList) {
-        this.imageTextList = imageTextList;
     }
 
     public String getEmail() {

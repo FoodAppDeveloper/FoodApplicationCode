@@ -62,6 +62,7 @@ public class EachDayFragment extends Fragment {
      * fragment.
      */
     private static final String ARG_SECTION_NAME = "section_name";
+    private static final String ARG_SECTION_DATE = "section_date";
     String mCurrentPhotoPath;
     private List<MealTimeItems> mItems;
     private String mCurrentPageName = null;
@@ -72,6 +73,7 @@ public class EachDayFragment extends Fragment {
     private ViewPager mViewPager;
     private SwipeSelector swipeSelector;
     private ImageView mImageView;
+    private String dateString;
 
     private List<EachMealFragment> mealFragments;
 
@@ -82,10 +84,11 @@ public class EachDayFragment extends Fragment {
      * Returns a new instance of this fragment for the given section
      * number.
      */
-    public static EachDayFragment newInstance(String sectionName) {
+    public static EachDayFragment newInstance(String sectionName, String dateString) {
         EachDayFragment fragment = new EachDayFragment();
         Bundle args = new Bundle();
         args.putString(ARG_SECTION_NAME, sectionName);
+        args.putString(ARG_SECTION_DATE, dateString);
         fragment.setArguments(args);
         return fragment;
     }
@@ -99,8 +102,8 @@ public class EachDayFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mCurrentPageName = getArguments().getString(ARG_SECTION_NAME);
+        dateString = getArguments().getString(ARG_SECTION_DATE);
         Log.v("Fragment", mCurrentPageName + " Created");
-
     }
 
     @Override
@@ -126,12 +129,12 @@ public class EachDayFragment extends Fragment {
         myList.setAdapter(madapter);
 
         mealFragments = new ArrayList<>();
-        mealFragments.add(EachMealFragment.newInstance(Util.BREAKFAST_FILE));
-        mealFragments.add(EachMealFragment.newInstance(Util.MORNING_SNACK_FILE));
-        mealFragments.add(EachMealFragment.newInstance(Util.LUNCH_FILE));
-        mealFragments.add(EachMealFragment.newInstance(Util.AFTERNOON_SNACK_FILE));
-        mealFragments.add(EachMealFragment.newInstance(Util.DINNER_FILE));
-        mealFragments.add(EachMealFragment.newInstance(Util.EVENING_SNACK_FILE));
+        mealFragments.add(EachMealFragment.newInstance(Util.BREAKFAST_FILE, dateString));
+        mealFragments.add(EachMealFragment.newInstance(Util.MORNING_SNACK_FILE, dateString));
+        mealFragments.add(EachMealFragment.newInstance(Util.LUNCH_FILE, dateString));
+        mealFragments.add(EachMealFragment.newInstance(Util.AFTERNOON_SNACK_FILE, dateString));
+        mealFragments.add(EachMealFragment.newInstance(Util.DINNER_FILE, dateString));
+        mealFragments.add(EachMealFragment.newInstance(Util.EVENING_SNACK_FILE, dateString));
 
         ItemClickSupport.addTo(myList).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
