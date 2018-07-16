@@ -3,8 +3,13 @@ package com.rtis.foodapp.adapters;
 import android.app.Activity;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.os.Build;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.view.PagerAdapter;
 import android.text.InputType;
@@ -29,10 +34,13 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.backendless.Backendless;
+import com.backendless.BackendlessUser;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.files.BackendlessFile;
-import com.backendless.files.BackendlessFileFactory;
+import com.backendless.persistence.BackendlessDataQuery;
+import com.backendless.persistence.DataQueryBuilder;
+import com.backendless.persistence.QueryOptions;
 import com.rtis.foodapp.R;
 import com.rtis.foodapp.backendless.Defaults;
 import com.rtis.foodapp.model.ImageText;
@@ -45,6 +53,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -69,15 +81,17 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
     private String meal_name;
     private List<ImageText> imageTextList;
     private File mCurrentFile;
+    private String fragmentDate;
 
     private final String HOUR = "Hour";
     private final String MINUTE = "Minute";
 
-    public EachMealSectionAdapter(Context context, List<ImageText> list, String meal) {
+    public EachMealSectionAdapter(Context context, List<ImageText> list, String meal, String date) {
         mContext = context;
         times = new ArrayList<>();
         meal_name = meal;
         imageTextList = list;
+        fragmentDate = date;
     }
 
     @Override
@@ -148,8 +162,7 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
         mImageView = (ImageView) layout.findViewById(R.id.capturedImage);
         if (imageTextList.size() > 0) {
             //query image file here
-            File image = new File(imageTextList.get(position).getImageFile());
-            Picasso.with(mContext).load(image).into(mImageView);
+            loadImageView(position);
         }
 
         return layout;
@@ -252,6 +265,7 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
                 String fileName = "TXT_" + imageName + ".txt";
 
                 if (imageTextList.get(position).isTextEmpty()) {
+                    // If doesn't exist, create new file
                     File storageDir = mContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
 
                     try {
@@ -262,12 +276,13 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
                         writer.close();
                         mCurrentFile = file;
                         uploadTextFile(position);
-                        imageTextList.get(position).setTextFile(file.getAbsolutePath());
+                        //imageTextList.get(position).setTextFile(file.getAbsolutePath());
 
                     } catch (IOException e) {
                         Util.showToast(mContext, "Text failed to save.");
                     }
                 } else {
+                    // If exists, pull file from database
                     try {
                         File file = new File(imageTextList.get(position).getTextFile());
                         FileWriter writer = new FileWriter(file);
@@ -311,5 +326,66 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
 
         });
     }
+
+    private Bitmap getImageBitmap(String url) {
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        try {
+            return BitmapFactory.decodeStream(new URL(url).openStream());
+        } catch(IOException e) {
+            //Log.v(e.getMessage());
+            return null;
+        }
+
+    }
+
+    private void loadImageView(final int position) {
+        //String ownerID = "ownerId = '" + Backendless.UserService.CurrentUser().getUserId() + "'";
+        //String date = "fragmentDate = " + fragmentDate;
+        //String meal = "meal = " + meal_name;
+        String whereClause = "ownerId = '" + Backendless.UserService.CurrentUser().getUserId() +
+                "' and fragmentDate = '" + fragmentDate + "' and meal = '" + meal_name + "'";
+        DataQueryBuilder queryBuilder = DataQueryBuilder.create();
+        queryBuilder.setWhereClause(whereClause);
+
+        Backendless.Data.of(ImageText.class).find(queryBuilder,
+                new AsyncCallback<List<ImageText>>() {
+                    @Override
+                    public void handleResponse(final List<ImageText> itList) {
+                        if(itList.isEmpty()) {
+                            Logger.v(" No Image Files Queried.");
+                        } else if (itList.size() == 1) {
+                            imageTextList = itList;
+                            String fileURL = itList.get(0).getImageFile();
+                            Picasso.with(mContext).load(fileURL).rotate(90).into(mImageView);
+                            Logger.v(" Retrieved Image File URL: ", fileURL);
+                            Logger.v(" Number of image files: " + itList.size());
+                        } else {
+                            imageTextList = itList;
+                            String fileURL = imageTextList.get(position).getImageFile();
+                                /*try {
+                                    ExifInterface exif = new ExifInterface(getImageBitmap(fileURL));
+                                    String x = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
+                                    Logger.v(" Image Orientation: " + x);
+                                } catch (IOException e) {
+
+                                }*/
+                            // Picasso auto rotates image by 90 degrees when EXIF orientation is 90
+                            Picasso.with(mContext).load(fileURL).rotate(90).into(mImageView);
+
+                            Logger.v(" Retrieved Image File URL: ", fileURL);
+                            Logger.v(" Number of image files: " + itList.size());
+                        }
+                    }
+
+                    @Override
+                    public void handleFault(BackendlessFault backendlessFault) {
+                        Logger.v(" Failed to retrieve image file URL", backendlessFault.getMessage());
+                    }
+
+                });
+    }
+
 
 }

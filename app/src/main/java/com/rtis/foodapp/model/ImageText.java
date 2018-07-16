@@ -1,7 +1,11 @@
 package com.rtis.foodapp.model;
 
+import android.app.IntentService;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.widget.Toast;
@@ -17,7 +21,11 @@ import com.rtis.foodapp.ui.fragments.EachMealFragment;
 import com.rtis.foodapp.utils.Logger;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.Date;
 
 import weborb.service.MapToProperty;
@@ -186,4 +194,5 @@ public class ImageText implements Parcelable {
             }
         });
     }
+
 }

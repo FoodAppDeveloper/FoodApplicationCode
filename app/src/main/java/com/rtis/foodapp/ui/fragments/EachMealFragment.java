@@ -25,6 +25,7 @@ import com.backendless.BackendlessUser;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.files.BackendlessFile;
+import com.backendless.persistence.DataQueryBuilder;
 import com.roughike.swipeselector.SwipeItem;
 import com.roughike.swipeselector.SwipeSelector;
 import com.rtis.foodapp.R;
@@ -34,6 +35,7 @@ import com.rtis.foodapp.model.FoodAppUser;
 import com.rtis.foodapp.model.ImageText;
 import com.rtis.foodapp.utils.Logger;
 import com.rtis.foodapp.utils.Util;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
@@ -105,6 +107,7 @@ public class EachMealFragment extends Fragment {
         if (savedInstanceState != null) {
             imageTextList = savedInstanceState.getParcelableArrayList("imageTextFiles");
         }
+        //queryImageText();
 
     }
 
@@ -113,6 +116,7 @@ public class EachMealFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View customView = inflater.inflate(R.layout.captured_meal_popup, container, false);
+        queryImageText();
 
         if (imageTextList.isEmpty()) {
             dispatchTakePictureIntent();
@@ -177,7 +181,7 @@ public class EachMealFragment extends Fragment {
         //ImageView popUpImageView=(ImageView) customView.findViewById(R.id.pop_imageView);
         mViewPager = (ViewPager) customView.findViewById(R.id.eachMealViewPager);
 
-        mViewPager.setAdapter(new EachMealSectionAdapter(getContext(), imageTextList, meal));
+        mViewPager.setAdapter(new EachMealSectionAdapter(getContext(), imageTextList, meal, date));
 
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -193,6 +197,7 @@ public class EachMealFragment extends Fragment {
             @Override
             public void onPageScrollStateChanged(int state) { }
         });
+
 
         // Set a click listener for the take picture button
         cameraButton.setOnClickListener(new View.OnClickListener() {
@@ -237,7 +242,7 @@ public class EachMealFragment extends Fragment {
 
             } catch (IOException ex) {
                 // Error occurred while creating the File
-                Util.showToast(getContext(), "Image failed to save.");
+                Util.showToast(getContext(), "Failed to capture image.");
             }
             // Continue only if the File was successfully created
             if (photoFile != null) {
@@ -284,16 +289,22 @@ public class EachMealFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             imageTextList.add(new ImageText(meal, date));
+            uploadImageFile(currentPos);
 
-            try {
+            if(mViewPager != null) {
+                mViewPager.getAdapter().notifyDataSetChanged();
+            }
+            /*try {
                 Bitmap imageBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), mCurrentPhotoUri);
-                uploadImageFile(mCurrentFileName, imageBitmap, currentPos);
+                uploadImageFile(currentPos);
 
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+                Util.showToast(getContext(), "Image failed to save.");
 
-            showPopUp();
+            }*/
+
+            //showPopUp();
         }
     }
 
@@ -308,31 +319,7 @@ public class EachMealFragment extends Fragment {
         getActivity().sendBroadcast(mediaScanIntent);
     }
 
-    public void uploadImageFile(final String fileName, Bitmap bitmapImage, final int position) {
-        /*
-        Backendless.Files.Android.upload(bitmapImage, Bitmap.CompressFormat.JPEG, 100,
-                fileName + ".jpg", Defaults.FILES_IMAGETEXT_DIRECTORY,
-                new AsyncCallback<BackendlessFile>() {
-
-                    @Override
-                    public void handleResponse(BackendlessFile backendlessFile) {
-                        ImageText imageText = imageTextList.get(position);
-                        imageText.setImageFile(backendlessFile.getFileURL());
-                        Logger.v(" Image File Url " + backendlessFile.getFileURL());
-                        imageTextList.set(position, imageText);
-                        ImageText.saveImageText(imageText);
-                        mCurrentFile.delete();
-                    }
-
-                    @Override
-                    public void handleFault(BackendlessFault backendlessFault) {
-                        Logger.v(" Image Upload Failed fault " +  backendlessFault.toString());
-                        Logger.v(" Image Upload Failed " + backendlessFault.getDetail());
-                        Logger.v(" Image Upload Failed message " + backendlessFault.getMessage());
-                    }
-
-                });*/
-
+    public void uploadImageFile(final int position) {
         Backendless.Files.upload(mCurrentFile, Defaults.FILES_IMAGETEXT_DIRECTORY, new AsyncCallback<BackendlessFile>() {
 
             @Override
@@ -343,6 +330,7 @@ public class EachMealFragment extends Fragment {
                 imageTextList.set(position, imageText);
                 ImageText.saveImageText(imageText);
                 mCurrentFile.delete();
+                showPopUp();
             }
 
             @Override
@@ -353,6 +341,33 @@ public class EachMealFragment extends Fragment {
             }
 
         });
+    }
+
+    public void queryImageText() {
+        String whereClause = "ownerId = '" + Backendless.UserService.CurrentUser().getUserId() +
+                "' and fragmentDate = '" + date + "' and meal = '" + meal + "'";
+        DataQueryBuilder queryBuilder = DataQueryBuilder.create();
+        queryBuilder.setWhereClause(whereClause);
+        Backendless.Data.of(ImageText.class).find(queryBuilder,
+                new AsyncCallback<List<ImageText>>() {
+                    @Override
+                    public void handleResponse(final List<ImageText> itList) {
+                        if(itList.isEmpty()) {
+                            Logger.v(" No Image Files Queried.");
+                        } else if (itList.size() == 1) {
+                            imageTextList = itList;
+                            Logger.v(" Queried one image file.");
+                        } else {
+                            imageTextList = itList;
+                            Logger.v(" Number of image files queried: " + itList.size());
+                        }
+                    }
+
+                    @Override
+                    public void handleFault(BackendlessFault backendlessFault) {
+                        Logger.v(" Failed to retrieve image file URL", backendlessFault.getMessage());
+                    }
+                });
     }
 
 }

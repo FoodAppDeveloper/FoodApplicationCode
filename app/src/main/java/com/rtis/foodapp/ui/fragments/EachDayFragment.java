@@ -136,6 +136,11 @@ public class EachDayFragment extends Fragment {
         mealFragments.add(EachMealFragment.newInstance(Util.DINNER_FILE, dateString));
         mealFragments.add(EachMealFragment.newInstance(Util.EVENING_SNACK_FILE, dateString));
 
+        // Update fragments to store images from database
+        for (EachMealFragment emf : mealFragments) {
+            emf.queryImageText();
+        }
+
         ItemClickSupport.addTo(myList).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
