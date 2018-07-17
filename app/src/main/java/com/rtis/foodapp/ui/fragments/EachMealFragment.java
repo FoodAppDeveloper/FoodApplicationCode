@@ -107,7 +107,7 @@ public class EachMealFragment extends Fragment {
         if (savedInstanceState != null) {
             imageTextList = savedInstanceState.getParcelableArrayList("imageTextFiles");
         }
-        //queryImageText();
+        queryImageText();
 
     }
 
@@ -133,6 +133,7 @@ public class EachMealFragment extends Fragment {
     }
 
     public void mealClicked() {
+        queryImageText();
         if (imageTextList.isEmpty()) {
             dispatchTakePictureIntent();
         } else {
@@ -203,6 +204,7 @@ public class EachMealFragment extends Fragment {
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                queryImageText();
                 mPopupWindow.dismiss();
                 dispatchTakePictureIntent();
             }
@@ -278,7 +280,6 @@ public class EachMealFragment extends Fragment {
 
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoPath = image.getAbsolutePath();
-        galleryAddPic();
 
         return image;
     }
@@ -289,7 +290,7 @@ public class EachMealFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             imageTextList.add(new ImageText(meal, date));
-            uploadImageFile(currentPos);
+            uploadImageFile(imageTextList.size() - 1); // point to last added element
 
             if(mViewPager != null) {
                 mViewPager.getAdapter().notifyDataSetChanged();

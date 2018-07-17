@@ -40,6 +40,7 @@ public class ImageText implements Parcelable {
     private String textFile;
     private String meal;
     private String fragmentDate;
+    private String objectId;
 
     public int describeContents() {
         return 0;
@@ -86,6 +87,14 @@ public class ImageText implements Parcelable {
         return meal;
     }
 
+    public void setObjectId(String id) {
+        objectId = id;
+    }
+
+    public String getObjectId() {
+        return objectId;
+    }
+
     public void setDate(String date) {
         fragmentDate = date;
     }
@@ -95,7 +104,7 @@ public class ImageText implements Parcelable {
     }
 
     public boolean isTextEmpty() {
-        return (textFile.isEmpty() || textFile.equals(""));
+        return (textFile == null || textFile.isEmpty() || textFile.equals(""));
 
     }
 
@@ -182,7 +191,7 @@ public class ImageText implements Parcelable {
     }*/
 
     public static void saveImageText(ImageText it) {
-        Backendless.Persistence.save(it, new AsyncCallback<ImageText>() {
+        Backendless.Data.of(ImageText.class).save(it, new AsyncCallback<ImageText>() {
             @Override
             public void handleResponse(ImageText response) {
                 Logger.v(" ImageText object saved ");
@@ -193,6 +202,22 @@ public class ImageText implements Parcelable {
                 Logger.v(" ImageText Save Failed: " + fault.getMessage());
             }
         });
+    }
+
+    public static void updateImageText(ImageText it){
+        Backendless.Persistence.of(ImageText.class).save(it, new AsyncCallback<ImageText>()
+        {
+            @Override
+            public void handleResponse( ImageText person ) {
+                Logger.v(" ImageText object updated ");
+            }
+
+            @Override
+            public void handleFault( BackendlessFault fault ) {
+                Logger.v(" ImageText Update Failed: " + fault.getMessage());
+            }
+        } );
+
     }
 
 }

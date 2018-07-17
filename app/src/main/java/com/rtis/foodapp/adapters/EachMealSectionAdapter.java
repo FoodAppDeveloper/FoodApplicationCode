@@ -54,9 +54,12 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -161,7 +164,6 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
 
         mImageView = (ImageView) layout.findViewById(R.id.capturedImage);
         if (imageTextList.size() > 0) {
-            //query image file here
             loadImageView(position);
         }
 
@@ -233,8 +235,33 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
         // if file exists, show text
         if (!imageTextList.get(position).isTextEmpty()) {
             StringBuffer data = new StringBuffer();
-
             try {
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+
+                URL url = new URL(imageTextList.get(position).getTextFile());
+                URLConnection uc1 = url.openConnection();
+                uc1.setDoInput(true);
+
+                // read text returned by server
+                BufferedReader in = new BufferedReader(new InputStreamReader(uc1.getInputStream()));
+
+                String line;
+                while ((line = in.readLine()) != null) {
+                    data.append(line);
+                    data.append('\n');
+                }
+                in.close();
+
+            }
+            catch (MalformedURLException e) {
+                Log.v(" Text Malformed URL: ", e.getMessage());
+            }
+            catch (IOException e) {
+                Log.v(" Fetch Text I/O Error: ", e.getMessage());
+            }
+
+            /*try {
                 FileReader fr = new FileReader(imageTextList.get(position).getTextFile());
                 BufferedReader br = new BufferedReader(fr);
                 String line;
@@ -244,10 +271,12 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
                 }
             } catch (IOException e) {
                 Util.showToast(mContext, "Text failed to open.");
-            }
+            }*/
 
             textView.setText(data);
         }
+
+        //final String data = textView.getText().toString();
 
         Button doneButton = (Button) customView.findViewById(R.id.doneButton);
         doneButton.setOnClickListener(new View.OnClickListener() {
@@ -264,7 +293,23 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
 
                 String fileName = "TXT_" + imageName + ".txt";
 
-                if (imageTextList.get(position).isTextEmpty()) {
+                File storageDir = mContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+
+                try {
+                    File file = new File(storageDir, fileName);
+                    FileWriter writer = new FileWriter(file);
+                    writer.append(data);
+                    writer.flush();
+                    writer.close();
+                    mCurrentFile = file;
+                    uploadTextFile(position);
+                    //imageTextList.get(position).setTextFile(file.getAbsolutePath());
+
+                } catch (IOException e) {
+                    Util.showToast(mContext, "Text failed to save.");
+                }
+
+                /*if (imageTextList.get(position).isTextEmpty()) {
                     // If doesn't exist, create new file
                     File storageDir = mContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
 
@@ -284,20 +329,24 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
                 } else {
                     // If exists, pull file from database
                     try {
-                        File file = new File(imageTextList.get(position).getTextFile());
-                        FileWriter writer = new FileWriter(file);
-                        writer.append(data);
-                        writer.flush();
-                        writer.close();
-                        mCurrentFile = file;
+                        // Code derived from: https://stackoverflow.com/questions/16585728/write-data-to-a-text-file-on-url-in-android
+                        //StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                        //StrictMode.setThreadPolicy(policy);
 
-                        uploadTextFile(position);
-
+                        URL u1 = new URL(imageTextList.get(position).getTextFile());
+                        URLConnection uc1 = u1.openConnection();
+                        uc1.setDoOutput(true);
+                        OutputStreamWriter out = new OutputStreamWriter(uc1.getOutputStream());
+                        out.append(data);
+                        out.flush();
+                        out.close();
+                        //ImageText.updateImageText(imageTextList.get(position));
                     } catch (IOException e) {
                         Util.showToast(mContext, "Text failed to save.");
                     }
-
-                }
+                }*/
+                //ImageText.updateImageText(imageTextList.get(position));
+                //notifyDataSetChanged();
             }
         });
 
@@ -309,11 +358,10 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
                 new AsyncCallback<BackendlessFile>() {
             @Override
             public void handleResponse(final BackendlessFile backendlessFile) {
-                ImageText imageText = imageTextList.get(position);
-                imageText.setTextFile(backendlessFile.getFileURL());
+                imageTextList.get(position).setTextFile(backendlessFile.getFileURL());
                 Logger.v(" Text File Url " + backendlessFile.getFileURL());
-                imageTextList.set(position, imageText);
-                ImageText.saveImageText(imageText);
+                //imageTextList.set(position, imageText);
+                ImageText.updateImageText(imageTextList.get(position));
                 mCurrentFile.delete();
             }
 
@@ -341,12 +389,24 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
     }
 
     private void loadImageView(final int position) {
+
+        String fileURL = imageTextList.get(position).getImageFile();
+        if (fileURL.isEmpty()) {
+            // show image not found txt
+        } else {
+            Picasso.with(mContext).load(fileURL).rotate(90).into(mImageView);
+            Logger.v(" Image File URL: ", fileURL);
+            Logger.v(" Number of image files: " + imageTextList.size());
+        }
+
         //String ownerID = "ownerId = '" + Backendless.UserService.CurrentUser().getUserId() + "'";
         //String date = "fragmentDate = " + fragmentDate;
         //String meal = "meal = " + meal_name;
+        /*
         String whereClause = "ownerId = '" + Backendless.UserService.CurrentUser().getUserId() +
                 "' and fragmentDate = '" + fragmentDate + "' and meal = '" + meal_name + "'";
         DataQueryBuilder queryBuilder = DataQueryBuilder.create();
+        queryBuilder.setSortBy("created");
         queryBuilder.setWhereClause(whereClause);
 
         Backendless.Data.of(ImageText.class).find(queryBuilder,
@@ -364,13 +424,13 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
                         } else {
                             imageTextList = itList;
                             String fileURL = imageTextList.get(position).getImageFile();
-                                /*try {
+                                //try {
                                     ExifInterface exif = new ExifInterface(getImageBitmap(fileURL));
                                     String x = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
                                     Logger.v(" Image Orientation: " + x);
                                 } catch (IOException e) {
 
-                                }*/
+                                }
                             // Picasso auto rotates image by 90 degrees when EXIF orientation is 90
                             Picasso.with(mContext).load(fileURL).rotate(90).into(mImageView);
 
@@ -384,7 +444,7 @@ public class EachMealSectionAdapter extends PagerAdapter implements TimePickerDi
                         Logger.v(" Failed to retrieve image file URL", backendlessFault.getMessage());
                     }
 
-                });
+                }); */
     }
 
 
