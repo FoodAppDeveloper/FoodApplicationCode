@@ -25,30 +25,17 @@
             android:scaleType="fitCenter" />
         <!--android:src="@drawable/abcd" />-->
 
-        <LinearLayout
-            android:id="@+id/timeView"
+        <TextView
+            android:id="@+id/timeText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="00:00"
+            android:freezesText="true"
+            android:textSize="24sp"
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="10dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/timeTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="11:39"
-                android:freezesText="true"
-                android:textSize="24sp" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:src="@drawable/ic_mode_edit_black_24dp" />
-        </LinearLayout>
+            android:gravity="center_vertical" />
 
         <ImageButton
             android:id="@+id/edit_button"
