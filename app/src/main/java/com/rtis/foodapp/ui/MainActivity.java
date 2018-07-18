@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
             swipeStrings.add(eachDayString);
             //Log.v("Day "," " +mDayNames[calendar.get(Calendar.DAY_OF_WEEK)] + " "+calendar.get(Calendar.DAY_OF_MONTH)+"/" + (calendar.get(Calendar.MONTH)+1));
             String dateString = new SimpleDateFormat("ddMMyy").format(calendar.getTime());
+            //dateString = new SimpleDateFormat("dd").format(calendar.get(Calendar.DAY_OF_MONTH));
             dateStrings.add(dateString);
             //Log.v("Date String: ", dateString);
         }

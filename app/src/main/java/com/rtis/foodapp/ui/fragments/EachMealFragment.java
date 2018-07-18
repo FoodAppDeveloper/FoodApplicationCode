@@ -1,8 +1,6 @@
 package com.rtis.foodapp.ui.fragments;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,7 +19,6 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 
 import com.backendless.Backendless;
-import com.backendless.BackendlessUser;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.files.BackendlessFile;
@@ -30,12 +27,12 @@ import com.roughike.swipeselector.SwipeItem;
 import com.roughike.swipeselector.SwipeSelector;
 import com.rtis.foodapp.R;
 import com.rtis.foodapp.adapters.EachMealSectionAdapter;
+import com.rtis.foodapp.adapters.EveryDayMealTimingsListAdapter;
 import com.rtis.foodapp.backendless.Defaults;
-import com.rtis.foodapp.model.FoodAppUser;
 import com.rtis.foodapp.model.ImageText;
+import com.rtis.foodapp.model.MealTimeItems;
 import com.rtis.foodapp.utils.Logger;
 import com.rtis.foodapp.utils.Util;
-import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,7 +47,6 @@ import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 public class EachMealFragment extends Fragment {
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
-    private String mCurrentFileName;
     private String mCurrentPhotoPath = "null";
     private PopupWindow mPopupWindow;
     private ViewPager mViewPager;
@@ -59,11 +55,7 @@ public class EachMealFragment extends Fragment {
 
     private File mCurrentFile;
 
-    private int currentPos = 0;
-
     private List<ImageText> imageTextList;
-
-    private EachMealSectionAdapter mAdapter;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -102,12 +94,16 @@ public class EachMealFragment extends Fragment {
             date = getArguments().getString(ARG_DATE);
             meal = getArguments().getString(ARG_MEAL);
         }
-        imageTextList = new ArrayList<>();
 
         if (savedInstanceState != null) {
             imageTextList = savedInstanceState.getParcelableArrayList("imageTextFiles");
+        } else {
+            queryImageText();
         }
-        queryImageText();
+        /*
+        if (imageTextList == null) {
+            imageTextList = new ArrayList<>();
+        }*/
 
     }
 
@@ -118,7 +114,7 @@ public class EachMealFragment extends Fragment {
         View customView = inflater.inflate(R.layout.captured_meal_popup, container, false);
         queryImageText();
 
-        if (imageTextList.isEmpty()) {
+        if (!containsImages()) {
             dispatchTakePictureIntent();
         } else {
             showPopUp();
@@ -133,8 +129,8 @@ public class EachMealFragment extends Fragment {
     }
 
     public void mealClicked() {
-        queryImageText();
-        if (imageTextList.isEmpty()) {
+        //queryImageText();
+        if (!containsImages()) {
             dispatchTakePictureIntent();
         } else {
             showPopUp();
@@ -173,13 +169,6 @@ public class EachMealFragment extends Fragment {
         ImageButton cameraButton = (ImageButton) customView.findViewById(R.id.take_picture);
         RelativeLayout mLayout = (RelativeLayout) customView.findViewById(R.id.popup_1);
 
-//        RecyclerView myList = (RecyclerView) customView.findViewById(R.id.eachMealList);
-//        LinearLayoutManager horizontalLayoutManagaer
-//                = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
-//        myList.setLayoutManager(horizontalLayoutManagaer);
-//        myList.setAdapter(new EachMealRecylerAdapter(getContext()));
-
-        //ImageView popUpImageView=(ImageView) customView.findViewById(R.id.pop_imageView);
         mViewPager = (ViewPager) customView.findViewById(R.id.eachMealViewPager);
 
         mViewPager.setAdapter(new EachMealSectionAdapter(getContext(), imageTextList, meal, date));
@@ -192,7 +181,6 @@ public class EachMealFragment extends Fragment {
             public void onPageSelected(int position) {
                 Log.v("Slider","Page Selected to "+position);
                 swipeSelector.selectItemAt(position);
-                currentPos = position;
             }
 
             @Override
@@ -233,8 +221,6 @@ public class EachMealFragment extends Fragment {
 
     public void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        //takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, getUriForCamera());
-        //startActivityForResult(takePictureIntent, Defaults.CAMERA_RESULT_CODE);
         // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
             // Create the File where the photo should go
@@ -255,11 +241,6 @@ public class EachMealFragment extends Fragment {
                 mCurrentPhotoUri = photoURI;
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-
-                //Bundle extras = takePictureIntent.getExtras();
-                //Bitmap imageBitmap = (Bitmap) extras.get("data");
-
-                //uploadImage(photoURI);
             }
         }
     }
@@ -268,7 +249,6 @@ public class EachMealFragment extends Fragment {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("HHmmss").format(new Date());
         String imageFileName = "JPEG_" + date + timeStamp + "_" + meal + "_";
-        mCurrentFileName = imageFileName;
         File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
                 imageFileName,   /* prefix */
@@ -295,17 +275,6 @@ public class EachMealFragment extends Fragment {
             if(mViewPager != null) {
                 mViewPager.getAdapter().notifyDataSetChanged();
             }
-            /*try {
-                Bitmap imageBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), mCurrentPhotoUri);
-                uploadImageFile(currentPos);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                Util.showToast(getContext(), "Image failed to save.");
-
-            }*/
-
-            //showPopUp();
         }
     }
 
@@ -369,6 +338,14 @@ public class EachMealFragment extends Fragment {
                         Logger.v(" Failed to retrieve image file URL", backendlessFault.getMessage());
                     }
                 });
+    }
+
+    public boolean containsImages() {
+        return imageTextList != null && !imageTextList.isEmpty();
+    }
+
+    public void setImageTextList(List<ImageText> imageTextList) {
+        this.imageTextList = imageTextList;
     }
 
 }

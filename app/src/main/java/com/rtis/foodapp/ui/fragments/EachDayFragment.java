@@ -29,14 +29,20 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 
+import com.backendless.Backendless;
+import com.backendless.async.callback.AsyncCallback;
+import com.backendless.exceptions.BackendlessFault;
+import com.backendless.persistence.DataQueryBuilder;
 import com.roughike.swipeselector.SwipeItem;
 import com.roughike.swipeselector.SwipeSelector;
 import com.rtis.foodapp.R;
 import com.rtis.foodapp.adapters.EachMealSectionAdapter;
 import com.rtis.foodapp.adapters.EveryDayMealTimingsListAdapter;
 import com.rtis.foodapp.callbacks.ItemClickSupport;
+import com.rtis.foodapp.model.ImageText;
 import com.rtis.foodapp.model.MealTimeItems;
 import com.rtis.foodapp.utils.ItemOffsetDecoration;
+import com.rtis.foodapp.utils.Logger;
 import com.rtis.foodapp.utils.Util;
 import com.squareup.picasso.Picasso;
 
@@ -129,24 +135,36 @@ public class EachDayFragment extends Fragment {
         myList.setAdapter(madapter);
 
         mealFragments = new ArrayList<>();
-        mealFragments.add(EachMealFragment.newInstance(Util.BREAKFAST_FILE, dateString));
-        mealFragments.add(EachMealFragment.newInstance(Util.MORNING_SNACK_FILE, dateString));
-        mealFragments.add(EachMealFragment.newInstance(Util.LUNCH_FILE, dateString));
-        mealFragments.add(EachMealFragment.newInstance(Util.AFTERNOON_SNACK_FILE, dateString));
-        mealFragments.add(EachMealFragment.newInstance(Util.DINNER_FILE, dateString));
-        mealFragments.add(EachMealFragment.newInstance(Util.EVENING_SNACK_FILE, dateString));
 
-        // Update fragments to store images from database
-        /*for (EachMealFragment emf : mealFragments) {
-            emf.queryImageText();
-        }*/
+        EachMealFragment breakfast = EachMealFragment.newInstance(Util.BREAKFAST_FILE, dateString);
+        mealFragments.add(breakfast);
+        queryImageText(0, Util.BREAKFAST_FILE, dateString);
+
+        EachMealFragment mornSnack = EachMealFragment.newInstance(Util.MORNING_SNACK_FILE, dateString);
+        mealFragments.add(mornSnack);
+        queryImageText(1, Util.MORNING_SNACK_FILE, dateString);
+
+        EachMealFragment lunch = EachMealFragment.newInstance(Util.LUNCH_FILE, dateString);
+        mealFragments.add(lunch);
+        queryImageText(2, Util.LUNCH_FILE, dateString);
+
+        EachMealFragment afterSnack = EachMealFragment.newInstance(Util.AFTERNOON_SNACK_FILE, dateString);
+        mealFragments.add(afterSnack);
+        queryImageText(3, Util.AFTERNOON_SNACK_FILE, dateString);
+
+        EachMealFragment dinner = EachMealFragment.newInstance(Util.DINNER_FILE, dateString);
+        mealFragments.add(dinner);
+        queryImageText(4, Util.DINNER_FILE, dateString);
+
+        EachMealFragment evenSnack = EachMealFragment.newInstance(Util.EVENING_SNACK_FILE, dateString);
+        mealFragments.add(evenSnack);
+        queryImageText(5, Util.EVENING_SNACK_FILE, dateString);
 
         ItemClickSupport.addTo(myList).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
                 // Position is recorded as position of selected meal in List
                 Log.v("EachList", mCurrentPageName + " " + position);
-                //dispatchTakePictureIntent(position);
                 //mealFragments.get(position).mealClicked();
 
                 if (!mealFragments.get(position).isAdded()) {
@@ -154,6 +172,7 @@ public class EachDayFragment extends Fragment {
                             .add(mealFragments.get(position), "meal_fragment")
                             .addToBackStack(null)
                             .commit();
+                    Log.v("Adding Meal Fragment: ", Integer.toString(position));
                 } else {
                     mealFragments.get(position).mealClicked();
                     /*getActivity().getSupportFragmentManager().beginTransaction()
@@ -163,7 +182,41 @@ public class EachDayFragment extends Fragment {
                 }
             }
         });
+
         return rootView;
+    }
+
+    public void queryImageText(final int position, String meal, String date) {
+        String whereClause = "ownerId = '" + Backendless.UserService.CurrentUser().getUserId() +
+                "' and fragmentDate = '" + date + "' and meal = '" + meal + "'";
+        Logger.v("Where Clause: ", whereClause);
+        DataQueryBuilder queryBuilder = DataQueryBuilder.create();
+        queryBuilder.setWhereClause(whereClause);
+        Backendless.Data.of(ImageText.class).find(queryBuilder,
+                new AsyncCallback<List<ImageText>>() {
+                    @Override
+                    public void handleResponse(final List<ImageText> itList) {
+                        if(itList.isEmpty()) {
+                            Logger.v(" No Image Files Queried.");
+                            mItems.get(position).setFill(false);
+                        } else if (itList.size() == 1) {
+                            mealFragments.get(position).setImageTextList(itList);
+                            mItems.get(position).setFill(true);
+                            madapter.notifyDataSetChanged();
+                            Logger.v(" Queried one image file.");
+                        } else {
+                            mealFragments.get(position).setImageTextList(itList);
+                            mItems.get(position).setFill(true);
+                            madapter.notifyDataSetChanged();
+                            Logger.v(" Number of image files queried: " + itList.size());
+                        }
+                    }
+
+                    @Override
+                    public void handleFault(BackendlessFault backendlessFault) {
+                        Logger.v(" Failed to retrieve image file URL", backendlessFault.getMessage());
+                    }
+                });
     }
 
     @Override

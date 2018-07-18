@@ -2,6 +2,7 @@ package com.rtis.foodapp.adapters;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 
 import com.rtis.foodapp.R;
 import com.rtis.foodapp.model.MealTimeItems;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -26,13 +28,19 @@ public class EveryDayMealTimingsListAdapter extends RecyclerView.Adapter<EveryDa
     private List<MealTimeItems> mItems;
     private EachItemHolder mCurrentHolder;
 
+    private static Drawable d;
+
+    private View mView;
+
     public EveryDayMealTimingsListAdapter(Context context, List<MealTimeItems> items) {
         mContext = context;
         mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mItems = items;
+        int id = R.drawable.plate;
+        d = context.getDrawable(id);
     }
 
-    public EachItemHolder getmCurrentHolder() {
+    public EachItemHolder getCurrentHolder() {
         return mCurrentHolder;
     }
 
@@ -41,21 +49,30 @@ public class EveryDayMealTimingsListAdapter extends RecyclerView.Adapter<EveryDa
         return mItems.size();
     }
 
+    public void fill() {
+        if (mView != null) {
+            mView.setBackgroundColor(0xff7aa091);
+        }
+    }
+
     @Override
     public EachItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = mLayoutInflater.inflate(R.layout.each_time_list_item, parent, false);
+        mView = mLayoutInflater.inflate(R.layout.each_time_list_item, parent, false);
         // work here if you need to control height of your items
         // keep in mind that parent is RecyclerView in this case
         int height = parent.getMeasuredHeight() / 3;
-        itemView.setMinimumHeight(height - 9);
-        return new EachItemHolder(itemView);
+        mView.setMinimumHeight(height - 9);
+        mView.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, height - 9));
 
+        mCurrentHolder = new EachItemHolder(mView);
+        return mCurrentHolder;
     }
 
     @Override
     public void onBindViewHolder(EachItemHolder holder, int position) {
         MealTimeItems item =  mItems.get(position);
         holder.txt_label.setText(item.getLabel());
+        holder.fill(item.isFill());
         mCurrentHolder = holder;
     }
 
@@ -64,8 +81,15 @@ public class EveryDayMealTimingsListAdapter extends RecyclerView.Adapter<EveryDa
         public ImageView imageView;
         public EachItemHolder(View itemView) {
             super(itemView);
+
             txt_label = (TextView) itemView.findViewById(R.id.txt_label);
             imageView = (ImageView) itemView.findViewById(R.id.eachMealImageView);
+        }
+
+        public void fill(boolean fill) {
+            if (fill) {
+                imageView.setImageDrawable(d);
+            }
         }
 
     }

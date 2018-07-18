@@ -5,9 +5,13 @@ package com.rtis.foodapp.model;
  */
 
 public class MealTimeItems {
+    private String label;
+    private boolean fill;
+
     public MealTimeItems(String itemLabel)
     {
         this.label=itemLabel;
+        fill = false;
     }
     public String getLabel() {
         return label;
@@ -17,6 +21,12 @@ public class MealTimeItems {
         this.label = labels;
     }
 
-    private String label;
+    public void setFill(boolean fill) {
+        this.fill = fill;
+    }
+
+    public boolean isFill() {
+        return fill;
+    }
 
 }
