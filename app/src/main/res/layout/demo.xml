@@ -26,6 +26,14 @@
         <!--android:src="@drawable/abcd" />-->
 
         <TextView
+            android:id="@+id/uploading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Uploading..."
+            android:textSize="30sp" />
+
+        <TextView
             android:id="@+id/timeText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

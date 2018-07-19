@@ -41,6 +41,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -57,6 +58,7 @@ public class EachMealSectionAdapter extends PagerAdapter {
     private List<ImageText> imageTextList;
     private File mCurrentFile;
     private String fragmentDate;
+    private TextView uploadTextView;
 
     public EachMealSectionAdapter(Context context, List<ImageText> list, String meal, String date) {
         mContext = context;
@@ -71,7 +73,7 @@ public class EachMealSectionAdapter extends PagerAdapter {
         LayoutInflater inflater = LayoutInflater.from(mContext);
         ViewGroup layout = (ViewGroup) inflater.inflate(R.layout.demo, collection, false);
         collection.addView(layout);
-        //timeTextView=(TextView)layout.findViewById(R.id.timeTextView);
+        uploadTextView = (TextView) layout.findViewById(R.id.uploading);
 
         timeTextView = (TextView) layout.findViewById(R.id.timeText);
 
@@ -79,6 +81,8 @@ public class EachMealSectionAdapter extends PagerAdapter {
         try {
             timestamp = new SimpleDateFormat("hh:mm aaa").format(imageTextList.get(position).getCreated());
         } catch (ArrayIndexOutOfBoundsException e) {
+
+        } catch (NullPointerException e) {
 
         }
         timeTextView.setText(timestamp);
@@ -239,9 +243,30 @@ public class EachMealSectionAdapter extends PagerAdapter {
             Picasso.with(mContext).load(fileURL).rotate(90).into(mImageView);
             Logger.v(" Image File URL: ", fileURL);
             Logger.v(" Number of image files: " + imageTextList.size());
+
+            String timestamp;
+            try {
+                timestamp = new SimpleDateFormat("hh:mm aaa").format(imageTextList.get(position).getCreated());
+                timeTextView.setText(timestamp);
+                Logger.v(" Set Timestamp to", timestamp);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                Date time = new Date();
+                timestamp = new SimpleDateFormat("hh:mm aaa").format(time);
+            } catch (NullPointerException e) {
+                Date time = new Date();
+                timestamp = new SimpleDateFormat("hh:mm aaa").format(time);
+            }
+            timeTextView.setText(timestamp);
+
+            uploadTextView.setText("");
         }
 
     }
 
+    public void refresh(List<ImageText> it, int position) {
+        imageTextList = it;
+        notifyDataSetChanged();
+        loadImageView(position);
+    }
 
 }

@@ -27,10 +27,8 @@ import com.roughike.swipeselector.SwipeItem;
 import com.roughike.swipeselector.SwipeSelector;
 import com.rtis.foodapp.R;
 import com.rtis.foodapp.adapters.EachMealSectionAdapter;
-import com.rtis.foodapp.adapters.EveryDayMealTimingsListAdapter;
 import com.rtis.foodapp.backendless.Defaults;
 import com.rtis.foodapp.model.ImageText;
-import com.rtis.foodapp.model.MealTimeItems;
 import com.rtis.foodapp.utils.Logger;
 import com.rtis.foodapp.utils.Util;
 
@@ -44,38 +42,44 @@ import java.util.List;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
+/**
+ * Fragment class to contain information for each meal and allows user to capture image
+ * using built-in camera.
+ * Initialized upon EachDayFragment onCreateView.
+ */
 public class EachMealFragment extends Fragment {
+    // Constant for image capturing
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
     private String mCurrentPhotoPath = "null";
     private PopupWindow mPopupWindow;
     private ViewPager mViewPager;
     private SwipeSelector swipeSelector;
-    Uri mCurrentPhotoUri;
-
+    private Uri mCurrentPhotoUri;
     private File mCurrentFile;
+    private EachMealSectionAdapter mAdapter;
 
+    // List of imageText objects stored in the fragment
     private List<ImageText> imageTextList;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    // Fragment identifiers
     private static final String ARG_MEAL = "meal";
     private static final String ARG_DATE = "date";
-
-    // TODO: Rename and change types of parameters
     private String meal;
     private String date;
 
+    /**
+     * Empty Constructor
+     */
     public EachMealFragment() {
-        // Required empty public constructor
     }
 
     /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
+     * Creates a new instance of EachMealFragment using parameters
      *
-     * @param meal Parameter 2.
-     * @return A new instance of fragment EachMealFragment.
+     * @param meal the meal the fragment belongs to
+     * @param date the date identifier for the fragment
+     * @return A new instance of fragment EachMealFragment
      */
     // TODO: Rename and change types and number of parameters
     public static EachMealFragment newInstance(String meal, String date) {
@@ -87,6 +91,11 @@ public class EachMealFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Sets fragment arguments and imageTextList.
+     *
+     * @param savedInstanceState Bundle containing previous state of fragment
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,18 +104,22 @@ public class EachMealFragment extends Fragment {
             meal = getArguments().getString(ARG_MEAL);
         }
 
+        // Set from previous state or queries database.
         if (savedInstanceState != null) {
             imageTextList = savedInstanceState.getParcelableArrayList("imageTextFiles");
         } else {
             queryImageText();
         }
-        /*
-        if (imageTextList == null) {
-            imageTextList = new ArrayList<>();
-        }*/
 
     }
 
+    /**
+     *
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -142,7 +155,7 @@ public class EachMealFragment extends Fragment {
         LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(LAYOUT_INFLATER_SERVICE);
 
         // Inflate the custom layout/view
-        View customView = inflater.inflate(R.layout.captured_meal_popup, null);
+        final View customView = inflater.inflate(R.layout.captured_meal_popup, null);
 
         // Initialize a new instance of popup window
         mPopupWindow = new PopupWindow(
@@ -170,12 +183,13 @@ public class EachMealFragment extends Fragment {
         RelativeLayout mLayout = (RelativeLayout) customView.findViewById(R.id.popup_1);
 
         mViewPager = (ViewPager) customView.findViewById(R.id.eachMealViewPager);
-
-        mViewPager.setAdapter(new EachMealSectionAdapter(getContext(), imageTextList, meal, date));
+        mAdapter = new EachMealSectionAdapter(getContext(), imageTextList, meal, date);
+        mViewPager.setAdapter(mAdapter);
 
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
+            public void onPageScrolled(int position, float positionOffset,
+                                       int positionOffsetPixels) { }
 
             @Override
             public void onPageSelected(int position) {
@@ -193,7 +207,6 @@ public class EachMealFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 queryImageText();
-                mPopupWindow.dismiss();
                 dispatchTakePictureIntent();
             }
         });
@@ -204,6 +217,7 @@ public class EachMealFragment extends Fragment {
             public void onClick(View view) {
                 // Dismiss the popup window
                 mPopupWindow.dismiss();
+                // update eachdayfragment adapter
             }
         });
 
@@ -228,7 +242,7 @@ public class EachMealFragment extends Fragment {
             try {
                 photoFile = createImageFile();
 
-            } catch (IOException ex) {
+            } catch (IOException e) {
                 // Error occurred while creating the File
                 Util.showToast(getContext(), "Failed to capture image.");
             }
@@ -269,28 +283,28 @@ public class EachMealFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            if (imageTextList == null) {
+                imageTextList = new ArrayList<>();
+            }
             imageTextList.add(new ImageText(meal, date));
             uploadImageFile(imageTextList.size() - 1); // point to last added element
 
             if(mViewPager != null) {
                 mViewPager.getAdapter().notifyDataSetChanged();
             }
+            showPopUp();
+
         }
     }
 
     /**
-     * Add current photo path to internal storage. Doesn't show up in gallery.
+     * Method to upload taken image and associated imageText object to cloud.
+     *
+     * @param position the position of the imageText in list
      */
-    private void galleryAddPic() {
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        File f = new File(mCurrentPhotoPath);
-        Uri contentUri = Uri.fromFile(f);
-        mediaScanIntent.setData(contentUri);
-        getActivity().sendBroadcast(mediaScanIntent);
-    }
-
     public void uploadImageFile(final int position) {
-        Backendless.Files.upload(mCurrentFile, Defaults.FILES_IMAGETEXT_DIRECTORY, new AsyncCallback<BackendlessFile>() {
+        Backendless.Files.upload(mCurrentFile, Defaults.FILES_IMAGETEXT_DIRECTORY,
+                new AsyncCallback<BackendlessFile>() {
 
             @Override
             public void handleResponse(BackendlessFile backendlessFile) {
@@ -300,7 +314,10 @@ public class EachMealFragment extends Fragment {
                 imageTextList.set(position, imageText);
                 ImageText.saveImageText(imageText);
                 mCurrentFile.delete();
-                showPopUp();
+
+                if (mAdapter != null) {
+                    mAdapter.refresh(imageTextList, position);
+                }
             }
 
             @Override
@@ -335,7 +352,8 @@ public class EachMealFragment extends Fragment {
 
                     @Override
                     public void handleFault(BackendlessFault backendlessFault) {
-                        Logger.v(" Failed to retrieve image file URL", backendlessFault.getMessage());
+                        Logger.v(" Failed to retrieve image file URL",
+                                backendlessFault.getMessage());
                     }
                 });
     }
