@@ -62,24 +62,19 @@ import static android.content.Context.LAYOUT_INFLATER_SERVICE;
  * fragment which represents a particular day
  */
 public class EachDayFragment extends Fragment {
-    static final int REQUEST_IMAGE_CAPTURE = 1;
     /**
      * The fragment argument representing the section number for this
      * fragment.
      */
     private static final String ARG_SECTION_NAME = "section_name";
     private static final String ARG_SECTION_DATE = "section_date";
-    String mCurrentPhotoPath;
     private List<MealTimeItems> mItems;
     private String mCurrentPageName = null;
-    private EveryDayMealTimingsListAdapter madapter;
-    private PopupWindow mPopupWindow;
+    public EveryDayMealTimingsListAdapter madapter;
     private RelativeLayout mRelativeLayout;
-    private File photoFile;
-    private ViewPager mViewPager;
-    private SwipeSelector swipeSelector;
-    private ImageView mImageView;
     private String dateString;
+    private boolean disabled = false;
+    public RecyclerView myList;
 
     private List<EachMealFragment> mealFragments;
 
@@ -113,11 +108,16 @@ public class EachDayFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_everyday_list, container, false);
         mRelativeLayout = (RelativeLayout) rootView.findViewById(R.id.fragment_relativeLayout);
-        RecyclerView myList = (RecyclerView) rootView.findViewById(R.id.myList);
+        myList = (RecyclerView) rootView.findViewById(R.id.myList);
         mItems = new ArrayList<>();
         mItems.add(new MealTimeItems(Util.BREAKFAST_STRING));           // 0
         mItems.add(new MealTimeItems(Util.MORNING_SNACK_STRING));       // 1
@@ -160,28 +160,7 @@ public class EachDayFragment extends Fragment {
         mealFragments.add(evenSnack);
         queryImageText(5, Util.EVENING_SNACK_FILE, dateString);
 
-        ItemClickSupport.addTo(myList).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
-            @Override
-            public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-                // Position is recorded as position of selected meal in List
-                Log.v("EachList", mCurrentPageName + " " + position);
-                //mealFragments.get(position).mealClicked();
-
-                if (!mealFragments.get(position).isAdded()) {
-                    getActivity().getSupportFragmentManager().beginTransaction()
-                            .add(mealFragments.get(position), "meal_fragment")
-                            .addToBackStack(null)
-                            .commit();
-                    Log.v("Adding Meal Fragment: ", Integer.toString(position));
-                } else {
-                    mealFragments.get(position).mealClicked();
-                    /*getActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.popup_1, mealFragments.get(position))
-                            .addToBackStack(null)
-                            .commit();*/
-                }
-            }
-        });
+        setItemClickSupport();
 
         return rootView;
     }
@@ -219,9 +198,29 @@ public class EachDayFragment extends Fragment {
                 });
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+    private void setItemClickSupport() {
+        ItemClickSupport.addTo(myList).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
+            @Override
+            public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+                // Position is recorded as position of selected meal in List
+                Log.v("EachList", mCurrentPageName + " " + position);
+                //mealFragments.get(position).mealClicked();
+
+                if (!mealFragments.get(position).isAdded()) {
+                    getActivity().getSupportFragmentManager().beginTransaction()
+                            .add(mealFragments.get(position), "meal_fragment")
+                            .addToBackStack(null)
+                            .commit();
+                    Log.v("Adding Meal Fragment: ", Integer.toString(position));
+                } else {
+                    mealFragments.get(position).mealClicked();
+                    /*getActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.popup_1, mealFragments.get(position))
+                            .addToBackStack(null)
+                            .commit();*/
+                }
+            }
+        });
     }
 
 }

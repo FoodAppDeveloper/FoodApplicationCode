@@ -3,6 +3,7 @@ package com.rtis.foodapp.adapters;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.util.Log;
 
 import com.rtis.foodapp.ui.fragments.EachDayFragment;
 
@@ -21,6 +22,8 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     private List<String> swipeStrings = null;
     private List<String> dateStrings = null;
+    private EachDayFragment currentFragment;
+
     public SectionsPagerAdapter(FragmentManager fm) {
         super(fm);
     }
@@ -35,7 +38,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         // getItem is called to instantiate the fragment for the given page.
         // Return a EachDayFragment (defined as a static inner class below).
-        //  return EachDayFragment.newInstance(position + 1);
+        // return EachDayFragment.newInstance(position + 1);
         return EachDayFragment.newInstance(swipeStrings.get(position), dateStrings.get(position));
     }
 

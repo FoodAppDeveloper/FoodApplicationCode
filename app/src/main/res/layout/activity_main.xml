@@ -9,43 +9,53 @@
 
     <!--<include layout="@layout/content_slider" />-->
     <RelativeLayout
+        android:id="@+id/activity_main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         tools:context="com.example.swipeselector.MainActivity">
 
-        <com.roughike.swipeselector.SwipeSelector
-            android:id="@+id/conditionSelector"
+        <FrameLayout
+            android:id="@+id/frame_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <com.roughike.swipeselector.SwipeSelector
+                android:id="@+id/conditionSelector"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="60dp"
+                app:swipe_descriptionGravity="center"
+                app:swipe_indicatorActiveColor="@color/swipe_selector_active_color"
+                app:swipe_indicatorInActiveColor="@color/swipeselector_color_indicator_inactive"
+                app:swipe_indicatorMargin="12dp"
+                app:swipe_indicatorSize="10dp"
+                app:swipe_leftButtonResource="@null"
+                app:swipe_rightButtonResource="@null"
+                app:swipe_titleTextAppearance="@style/AppTheme.SwipeTitleAppearance">
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/container"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="40dp"
+                    android:layout_marginTop="60dp"
+                    android:background="@color/white"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+            </com.roughike.swipeselector.SwipeSelector>
+        </FrameLayout>
+
+        <android.support.design.widget.BottomNavigationView
+            android:id="@+id/bottom_navigation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="60dp"
-            app:swipe_descriptionGravity="center"
-            app:swipe_indicatorActiveColor="@color/swipe_selector_active_color"
-            app:swipe_indicatorInActiveColor="@color/swipeselector_color_indicator_inactive"
-            app:swipe_indicatorMargin="12dp"
-            app:swipe_indicatorSize="10dp"
-            app:swipe_leftButtonResource="@null"
-            app:swipe_rightButtonResource="@null"
-            app:swipe_titleTextAppearance="@style/AppTheme.SwipeTitleAppearance">
-
-            >
-
-            <android.support.v4.view.ViewPager
-                android:id="@+id/container"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="40dp"
-                android:layout_marginTop="60dp"
-                android:background="@color/white"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-        </com.roughike.swipeselector.SwipeSelector>
-
-        <com.roughike.bottombar.BottomBar
-            android:id="@+id/bottomBar"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
             android:layout_alignParentBottom="true"
-            app:bb_tabXmlResource="@xml/bottom_navigation_items" />
+            android:background="@color/colorPrimary"
+            android:visibility="visible"
+            app:itemIconTint="@color/bb_darkBackgroundColor"
+            app:itemTextColor="@color/cast_expanded_controller_text_color"
+            app:menu="@menu/bottombar" />
+
     </RelativeLayout>
 
 

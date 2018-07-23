@@ -91,6 +91,12 @@ public class EachMealFragment extends Fragment {
         return fragment;
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("imageTextFiles", (ArrayList) imageTextList);
+    }
+
     /**
      * Sets fragment arguments and imageTextList.
      *
@@ -206,7 +212,8 @@ public class EachMealFragment extends Fragment {
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                queryImageText();
+                //queryImageText();
+                mPopupWindow.dismiss();
                 dispatchTakePictureIntent();
             }
         });
@@ -223,12 +230,6 @@ public class EachMealFragment extends Fragment {
 
         mPopupWindow.showAtLocation(mLayout, Gravity.CENTER, 0, 0);
 
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList("imageTextFiles", (ArrayList) imageTextList);
     }
 
     /* Deal with Camera */

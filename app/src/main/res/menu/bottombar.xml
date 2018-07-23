@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/tab_today"
+        android:icon="@drawable/ic_today_black_24dp"
+        android:title="Today" />
+    <item
+        android:id="@+id/tab_tips"
+        android:icon="@drawable/ic_note_black_24dp"
+        android:title="Tips" />
+    <item
+        android:id="@+id/tab_coach"
+        android:icon="@drawable/ic_announcement_black_24dp"
+        android:title="Coach" />
+    <item
+        android:id="@+id/tab_settings"
+        android:icon="@drawable/ic_settings_black_24dp"
+        android:title="Settings" />
+</menu>

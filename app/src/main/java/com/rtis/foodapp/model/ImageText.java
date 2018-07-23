@@ -1,37 +1,14 @@
 package com.rtis.foodapp.model;
 
-import android.app.IntentService;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.widget.Toast;
 
 import com.backendless.Backendless;
-import com.backendless.BackendlessUser;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
-import com.backendless.files.BackendlessFile;
-import com.backendless.persistence.DataQueryBuilder;
-import com.rtis.foodapp.backendless.Defaults;
-import com.rtis.foodapp.ui.RegisterActivity;
-import com.rtis.foodapp.ui.fragments.EachMealFragment;
 import com.rtis.foodapp.utils.Logger;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-
-import weborb.service.MapToProperty;
 
 /**
  * Class that stores the image file and text file associated with it.
@@ -45,6 +22,8 @@ public class ImageText implements Parcelable {
     private String fragmentDate;
     private String objectId;
     private Date created;
+
+    /** Parcelable required methods */
 
     public int describeContents() {
         return 0;
@@ -71,16 +50,40 @@ public class ImageText implements Parcelable {
         textFile = in.readString();
     }
 
+    /**
+     * Empty constructor.
+     */
     public ImageText() {
         imageFile = "";
         textFile = "";
     }
 
+    /**
+     * Constructor to initialize variables.
+     *
+     * @param meal the meal the object belongs to
+     * @param date the date identifier for the object
+     */
     public ImageText(String meal, String date) {
         imageFile = "";
         textFile = "";
         this.meal = meal;
         this.fragmentDate = date;
+    }
+
+    /**
+     * Checks if textFile stores data.
+     *
+     * @return true if empty, false otherwise
+     */
+    public boolean isTextEmpty() {
+        return (textFile == null || textFile.isEmpty() || textFile.equals(""));
+    }
+
+    /** Getters and Setters */
+
+    public void setCreated(Date created) {
+        this.created = created;
     }
 
     public Date getCreated() {
@@ -111,11 +114,6 @@ public class ImageText implements Parcelable {
         return fragmentDate;
     }
 
-    public boolean isTextEmpty() {
-        return (textFile == null || textFile.isEmpty() || textFile.equals(""));
-
-    }
-
     public String getImageFile() {
         return imageFile;
     }
@@ -132,6 +130,11 @@ public class ImageText implements Parcelable {
         textFile = file;
     }
 
+    /**
+     * Static method to save object to cloud.
+     *
+     * @param it the ImageText object to save
+     */
     public static void saveImageText(ImageText it) {
         Backendless.Data.of(ImageText.class).save(it, new AsyncCallback<ImageText>() {
             @Override
@@ -146,6 +149,11 @@ public class ImageText implements Parcelable {
         });
     }
 
+    /**
+     * Static method to update existing ImageText object.
+     *
+     * @param it the ImageText object to update.
+     */
     public static void updateImageText(ImageText it){
         Backendless.Persistence.of(ImageText.class).save(it, new AsyncCallback<ImageText>()
         {

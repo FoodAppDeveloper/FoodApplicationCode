@@ -1,20 +1,33 @@
 package com.rtis.foodapp.ui;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.backendless.Backendless;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
+import com.roughike.bottombar.BottomBar;
 import com.roughike.swipeselector.OnSwipeItemSelectedListener;
 import com.roughike.swipeselector.SwipeItem;
 import com.roughike.swipeselector.SwipeSelector;
 import com.rtis.foodapp.R;
 import com.rtis.foodapp.adapters.SectionsPagerAdapter;
+import com.rtis.foodapp.ui.fragments.SettingsFragment;
 import com.rtis.foodapp.utils.Util;
 
 import java.text.DateFormatSymbols;
@@ -26,21 +39,27 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
     private SwipeSelector swipeSelector;
     private String[] mDayNames;
+    private SettingsFragment settingsFragment;
+    private Fragment currentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        // initialize the current week date values
+        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //setSupportActionBar(toolbar);
+        settingsFragment = SettingsFragment.newInstance();
+
+        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
+
+                // initialize the current week date values
         mDayNames = new DateFormatSymbols().getWeekdays();
         List<String> swipeStrings = new ArrayList<>();
         List<String> dateStrings = new ArrayList<>();
@@ -65,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        final ViewPager.OnPageChangeListener pageChangeListener = new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -81,8 +100,9 @@ public class MainActivity extends AppCompatActivity {
             public void onPageScrollStateChanged(int state) {
 
             }
-        });
+        };
 
+        mViewPager.addOnPageChangeListener(pageChangeListener);
 
         swipeSelector = (SwipeSelector) findViewById(R.id.conditionSelector);
         swipeSelector.setItems(
@@ -102,18 +122,59 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        bottomNavigationView.setOnNavigationItemSelectedListener
+                (new BottomNavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                        //FragmentManager fm = getSupportFragmentManager();
+                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                        transaction.setCustomAnimations(android.R.anim.fade_in,
+                                android.R.anim.fade_out);
+                        Log.v(" Menu pressed", "");
+                        switch (item.getItemId()) {
+                            case R.id.tab_today:
+                                if (currentFragment != null && currentFragment == settingsFragment) {
+                                    transaction.hide(settingsFragment);
+                                    transaction.commit();
+
+                                    currentFragment = null;
+                                }
+
+                                Log.v(" Today tab pressed", "");
+                                break;
+                            case R.id.tab_coach:
+                                break;
+                            case R.id.tab_tips:
+                                break;
+                            case R.id.tab_settings:
+                                if (currentFragment != settingsFragment) {
+                                    transaction.replace(R.id.frame_layout, settingsFragment);
+                                    transaction.show(settingsFragment);
+                                    transaction.commit();
+
+                                    currentFragment = settingsFragment;
+                                }
+                                Log.v(" Settings tab pressed", "");
+                                break;
+                        }
+
+                        return true;
+                    }
+                });
+
     }
 
-    private void logout() {
-        Backendless.UserService.logout(new AsyncCallback<Void>() {
-            public void handleResponse(Void response) {
-                // user has been logged out.
-                startActivity(new Intent(MainActivity.this, SplashActivity.class));
-            }
-
-            public void handleFault(BackendlessFault fault) {
-                // something went wrong and logout failed, to get the error code call fault.getCode()
-            }
-        });
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.bottombar, menu);
+        return true;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return true;
+    }
+
+
+
 }

@@ -221,6 +221,7 @@ public class EachMealSectionAdapter extends PagerAdapter {
         });
     }
 
+/*
     private Bitmap getImageBitmap(String url) {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -232,7 +233,7 @@ public class EachMealSectionAdapter extends PagerAdapter {
             return null;
         }
 
-    }
+    }*/
 
     private void loadImageView(final int position) {
 
@@ -258,7 +259,8 @@ public class EachMealSectionAdapter extends PagerAdapter {
             }
             timeTextView.setText(timestamp);
 
-            uploadTextView.setText("");
+            uploadTextView.setText("Loading...");
+            mImageView.bringToFront();
         }
 
     }
