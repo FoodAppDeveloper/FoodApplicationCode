@@ -14,6 +14,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
@@ -58,6 +59,7 @@ public class EachMealFragment extends Fragment {
     private Uri mCurrentPhotoUri;
     private File mCurrentFile;
     private EachMealSectionAdapter mAdapter;
+    private int currentPos;
 
     // List of imageText objects stored in the fragment
     private List<ImageText> imageTextList;
@@ -116,6 +118,8 @@ public class EachMealFragment extends Fragment {
         } else {
             queryImageText();
         }
+
+        currentPos = 0;
 
     }
 
@@ -187,6 +191,7 @@ public class EachMealFragment extends Fragment {
         ImageButton closeButton = (ImageButton) customView.findViewById(R.id.close_popup);
         ImageButton cameraButton = (ImageButton) customView.findViewById(R.id.take_picture);
         RelativeLayout mLayout = (RelativeLayout) customView.findViewById(R.id.popup_1);
+        Button deleteButton = (Button) customView.findViewById(R.id.delete_button);
 
         mViewPager = (ViewPager) customView.findViewById(R.id.eachMealViewPager);
         mAdapter = new EachMealSectionAdapter(getContext(), imageTextList, meal, date);
@@ -200,6 +205,7 @@ public class EachMealFragment extends Fragment {
             @Override
             public void onPageSelected(int position) {
                 Log.v("Slider","Page Selected to "+position);
+                currentPos = position;
                 swipeSelector.selectItemAt(position);
             }
 
@@ -228,13 +234,21 @@ public class EachMealFragment extends Fragment {
             }
         });
 
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deleteImageText(currentPos);
+
+            }
+        });
+
         mPopupWindow.showAtLocation(mLayout, Gravity.CENTER, 0, 0);
 
     }
 
     /* Deal with Camera */
 
-    public void dispatchTakePictureIntent() {
+    private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
@@ -303,7 +317,7 @@ public class EachMealFragment extends Fragment {
      *
      * @param position the position of the imageText in list
      */
-    public void uploadImageFile(final int position) {
+    private void uploadImageFile(final int position) {
         Backendless.Files.upload(mCurrentFile, Defaults.FILES_IMAGETEXT_DIRECTORY,
                 new AsyncCallback<BackendlessFile>() {
 
@@ -329,6 +343,83 @@ public class EachMealFragment extends Fragment {
             }
 
         });
+    }
+
+    private void deleteImageText(final int position) {
+        // deletes database object and deletes files
+        ImageText it = imageTextList.get(position);
+        int splitIndex = it.getImageFile().lastIndexOf('/') - 9;
+        String fileName = it.getImageFile().substring(splitIndex);
+
+        Backendless.Files.remove(fileName, new AsyncCallback<Void>() {
+            @Override
+            public void handleResponse(Void response) {
+                Logger.v("Deleted Image File");
+
+                /* Delete text File if exists */
+                if (!imageTextList.get(position).isTextEmpty()) {
+                    ImageText it = imageTextList.get(position);
+                    int splitIndex = it.getTextFile().lastIndexOf('/') - 9;
+                    String fileName = it.getTextFile().substring(splitIndex);
+
+                    Backendless.Files.remove(fileName, new AsyncCallback<Void>() {
+                        @Override
+                        public void handleResponse(Void response) {
+                            Logger.v("Deleted Text File");
+
+                            deleteObject(position);
+                        }
+
+                        @Override
+                        public void handleFault(BackendlessFault fault) {
+                            Logger.v(" Delete Text File Failed fault " +  fault.toString());
+                            Logger.v(" Delete Text File Failed " + fault.getDetail());
+                            Logger.v(" Delete Text File Failed message " + fault.getMessage());
+                        }
+                    });
+                } else {
+                    deleteObject(position);
+                }
+            }
+
+            @Override
+            public void handleFault(BackendlessFault fault) {
+                Logger.v(" Delete Image File Failed fault " +  fault.toString());
+                Logger.v(" Delete Image File Failed " + fault.getDetail());
+                Logger.v(" Delete Image File Failed message " + fault.getMessage());
+                Logger.v( " Image File URL: " + imageTextList.get(position).getImageFile());
+            }
+        });
+
+    }
+
+    /**
+     * Helper function to delete ImageText Object.
+     *
+     * @param position the position of the object in ImageText list
+     */
+    private void deleteObject(final int position) {
+        Backendless.Persistence.of(ImageText.class).remove(imageTextList.get(position),
+                new AsyncCallback<Long>() {
+                    @Override
+                    public void handleResponse(Long response) {
+                        Logger.v("Deleted ImageText Object: " + response.toString());
+                        imageTextList.remove(position);
+                        mAdapter.setImageTextList(imageTextList);
+                        mPopupWindow.dismiss();
+                        if (!imageTextList.isEmpty()) {
+                            showPopUp();
+                        }
+                        queryImageText();
+                    }
+
+                    @Override
+                    public void handleFault(BackendlessFault fault) {
+                        Logger.v(" Delete ImageText Failed fault " +  fault.toString());
+                        Logger.v(" Delete ImageText Failed " + fault.getDetail());
+                        Logger.v(" Delete ImageText Failed message " + fault.getMessage());
+                    }
+                });
     }
 
     public void queryImageText() {

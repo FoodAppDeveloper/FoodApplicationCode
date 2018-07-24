@@ -271,4 +271,9 @@ public class EachMealSectionAdapter extends PagerAdapter {
         loadImageView(position);
     }
 
+    public void setImageTextList(List<ImageText> it) {
+        imageTextList = it;
+        notifyDataSetChanged();
+    }
+
 }
