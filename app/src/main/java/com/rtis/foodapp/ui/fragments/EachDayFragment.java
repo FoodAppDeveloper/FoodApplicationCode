@@ -70,11 +70,10 @@ public class EachDayFragment extends Fragment {
     private static final String ARG_SECTION_DATE = "section_date";
     private List<MealTimeItems> mItems;
     private String mCurrentPageName = null;
-    public EveryDayMealTimingsListAdapter madapter;
+    private EveryDayMealTimingsListAdapter madapter;
     private RelativeLayout mRelativeLayout;
     private String dateString;
-    private boolean disabled = false;
-    public RecyclerView myList;
+    private RecyclerView myList;
 
     private List<EachMealFragment> mealFragments;
 
@@ -105,6 +104,7 @@ public class EachDayFragment extends Fragment {
         mCurrentPageName = getArguments().getString(ARG_SECTION_NAME);
         dateString = getArguments().getString(ARG_SECTION_DATE);
         Log.v("Fragment", mCurrentPageName + " Created");
+
     }
 
     @Override
@@ -137,65 +137,32 @@ public class EachDayFragment extends Fragment {
         mealFragments = new ArrayList<>();
 
         EachMealFragment breakfast = EachMealFragment.newInstance(Util.BREAKFAST_FILE, dateString);
+        breakfast.setUp(Util.BREAKFAST_FILE, dateString, this, mItems.get(0));
         mealFragments.add(breakfast);
-        queryImageText(0, Util.BREAKFAST_FILE, dateString);
 
         EachMealFragment mornSnack = EachMealFragment.newInstance(Util.MORNING_SNACK_FILE, dateString);
+        mornSnack.setUp(Util.MORNING_SNACK_FILE, dateString, this, mItems.get(1));
         mealFragments.add(mornSnack);
-        queryImageText(1, Util.MORNING_SNACK_FILE, dateString);
 
         EachMealFragment lunch = EachMealFragment.newInstance(Util.LUNCH_FILE, dateString);
+        lunch.setUp(Util.LUNCH_FILE, dateString, this, mItems.get(2));
         mealFragments.add(lunch);
-        queryImageText(2, Util.LUNCH_FILE, dateString);
 
         EachMealFragment afterSnack = EachMealFragment.newInstance(Util.AFTERNOON_SNACK_FILE, dateString);
+        afterSnack.setUp(Util.AFTERNOON_SNACK_FILE, dateString, this, mItems.get(3));
         mealFragments.add(afterSnack);
-        queryImageText(3, Util.AFTERNOON_SNACK_FILE, dateString);
 
         EachMealFragment dinner = EachMealFragment.newInstance(Util.DINNER_FILE, dateString);
+        dinner.setUp(Util.DINNER_FILE, dateString, this, mItems.get(4));
         mealFragments.add(dinner);
-        queryImageText(4, Util.DINNER_FILE, dateString);
 
         EachMealFragment evenSnack = EachMealFragment.newInstance(Util.EVENING_SNACK_FILE, dateString);
+        evenSnack.setUp(Util.EVENING_SNACK_FILE, dateString, this, mItems.get(5));
         mealFragments.add(evenSnack);
-        queryImageText(5, Util.EVENING_SNACK_FILE, dateString);
 
         setItemClickSupport();
 
         return rootView;
-    }
-
-    public void queryImageText(final int position, String meal, String date) {
-        String whereClause = "ownerId = '" + Backendless.UserService.CurrentUser().getUserId() +
-                "' and fragmentDate = '" + date + "' and meal = '" + meal + "'";
-        Logger.v("Where Clause: ", whereClause);
-        DataQueryBuilder queryBuilder = DataQueryBuilder.create();
-        queryBuilder.setWhereClause(whereClause);
-        Backendless.Data.of(ImageText.class).find(queryBuilder,
-                new AsyncCallback<List<ImageText>>() {
-                    @Override
-                    public void handleResponse(final List<ImageText> itList) {
-                        if(itList.isEmpty()) {
-                            Logger.v(" No Image Files Queried.");
-                            mItems.get(position).setFill(false);
-                        } else if (itList.size() == 1) {
-                            mealFragments.get(position).setImageTextList(itList);
-                            mItems.get(position).setFill(true);
-                            madapter.notifyDataSetChanged();
-                            Logger.v(" Queried one image file.");
-                        } else {
-                            mealFragments.get(position).setImageTextList(itList);
-                            mItems.get(position).setFill(true);
-                            madapter.notifyDataSetChanged();
-                            Logger.v(" Number of image files queried: " + itList.size());
-                        }
-                    }
-
-                    @Override
-                    public void handleFault(BackendlessFault backendlessFault) {
-                        Logger.v(" Failed to retrieve image file URL", backendlessFault.getMessage());
-                    }
-                });
     }
 
     private void setItemClickSupport() {
@@ -221,6 +188,10 @@ public class EachDayFragment extends Fragment {
                 }
             }
         });
+    }
+
+    public void update() {
+        madapter.notifyDataSetChanged();
     }
 
 }

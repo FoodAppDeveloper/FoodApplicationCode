@@ -26,7 +26,6 @@ public class EveryDayMealTimingsListAdapter extends RecyclerView.Adapter<EveryDa
     private LayoutInflater mLayoutInflater;
 
     private List<MealTimeItems> mItems;
-    private EachItemHolder mCurrentHolder;
 
     private static Drawable d;
 
@@ -40,19 +39,9 @@ public class EveryDayMealTimingsListAdapter extends RecyclerView.Adapter<EveryDa
         d = context.getDrawable(id);
     }
 
-    public EachItemHolder getCurrentHolder() {
-        return mCurrentHolder;
-    }
-
     @Override
     public int getItemCount() {
         return mItems.size();
-    }
-
-    public void fill() {
-        if (mView != null) {
-            mView.setBackgroundColor(0xff7aa091);
-        }
     }
 
     @Override
@@ -64,8 +53,7 @@ public class EveryDayMealTimingsListAdapter extends RecyclerView.Adapter<EveryDa
         mView.setMinimumHeight(height - 9);
         mView.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, height - 9));
 
-        mCurrentHolder = new EachItemHolder(mView);
-        return mCurrentHolder;
+        return new EachItemHolder(mView);
     }
 
     @Override
@@ -73,7 +61,6 @@ public class EveryDayMealTimingsListAdapter extends RecyclerView.Adapter<EveryDa
         MealTimeItems item =  mItems.get(position);
         holder.txt_label.setText(item.getLabel());
         holder.fill(item.isFill());
-        mCurrentHolder = holder;
     }
 
     public static class EachItemHolder extends RecyclerView.ViewHolder {
@@ -89,6 +76,8 @@ public class EveryDayMealTimingsListAdapter extends RecyclerView.Adapter<EveryDa
         public void fill(boolean fill) {
             if (fill) {
                 imageView.setImageDrawable(d);
+            } else {
+                imageView.setImageDrawable(null);
             }
         }
 

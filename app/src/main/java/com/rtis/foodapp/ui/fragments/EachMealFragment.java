@@ -30,6 +30,7 @@ import com.rtis.foodapp.R;
 import com.rtis.foodapp.adapters.EachMealSectionAdapter;
 import com.rtis.foodapp.backendless.Defaults;
 import com.rtis.foodapp.model.ImageText;
+import com.rtis.foodapp.model.MealTimeItems;
 import com.rtis.foodapp.utils.Logger;
 import com.rtis.foodapp.utils.Util;
 
@@ -60,6 +61,8 @@ public class EachMealFragment extends Fragment {
     private File mCurrentFile;
     private EachMealSectionAdapter mAdapter;
     private int currentPos;
+    private EachDayFragment parentFragment;
+    private MealTimeItems mealItem;
 
     // List of imageText objects stored in the fragment
     private List<ImageText> imageTextList;
@@ -83,7 +86,6 @@ public class EachMealFragment extends Fragment {
      * @param date the date identifier for the fragment
      * @return A new instance of fragment EachMealFragment
      */
-    // TODO: Rename and change types and number of parameters
     public static EachMealFragment newInstance(String meal, String date) {
         EachMealFragment fragment = new EachMealFragment();
         Bundle args = new Bundle();
@@ -91,6 +93,14 @@ public class EachMealFragment extends Fragment {
         args.putString(ARG_MEAL, meal);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    public void setUp(String meal, String date, EachDayFragment fragment, MealTimeItems item) {
+        this.meal = meal;
+        this.date = date;
+        this.parentFragment = fragment;
+        this.mealItem = item;
+        queryImageText();
     }
 
     @Override
@@ -113,11 +123,12 @@ public class EachMealFragment extends Fragment {
         }
 
         // Set from previous state or queries database.
-        if (savedInstanceState != null) {
+        /*if (savedInstanceState != null) {
             imageTextList = savedInstanceState.getParcelableArrayList("imageTextFiles");
         } else {
             queryImageText();
-        }
+        }*/
+        queryImageText();
 
         currentPos = 0;
 
@@ -218,7 +229,6 @@ public class EachMealFragment extends Fragment {
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //queryImageText();
                 mPopupWindow.dismiss();
                 dispatchTakePictureIntent();
             }
@@ -230,7 +240,6 @@ public class EachMealFragment extends Fragment {
             public void onClick(View view) {
                 // Dismiss the popup window
                 mPopupWindow.dismiss();
-                // update eachdayfragment adapter
             }
         });
 
@@ -238,7 +247,6 @@ public class EachMealFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 deleteImageText(currentPos);
-
             }
         });
 
@@ -333,6 +341,9 @@ public class EachMealFragment extends Fragment {
                 if (mAdapter != null) {
                     mAdapter.refresh(imageTextList, position);
                 }
+
+                mealItem.setFill(true);
+                updateParent();
             }
 
             @Override
@@ -407,10 +418,12 @@ public class EachMealFragment extends Fragment {
                         imageTextList.remove(position);
                         mAdapter.setImageTextList(imageTextList);
                         mPopupWindow.dismiss();
-                        if (!imageTextList.isEmpty()) {
+                        if (containsImages()) {
                             showPopUp();
+                        } else {
+                            mealItem.setFill(false);
+                            updateParent();
                         }
-                        queryImageText();
                     }
 
                     @Override
@@ -431,15 +444,23 @@ public class EachMealFragment extends Fragment {
                 new AsyncCallback<List<ImageText>>() {
                     @Override
                     public void handleResponse(final List<ImageText> itList) {
-                        if(itList.isEmpty()) {
+                        imageTextList = itList;
+                        if(!containsImages()) {
                             Logger.v(" No Image Files Queried.");
-                        } else if (itList.size() == 1) {
-                            imageTextList = itList;
-                            Logger.v(" Queried one image file.");
+                            if (mealItem != null) {
+                                mealItem.setFill(false);
+                            }
                         } else {
-                            imageTextList = itList;
+                            if (mealItem != null) {
+                                Logger.v(" Meal Item set to true");
+                                mealItem.setFill(true);
+                            }
                             Logger.v(" Number of image files queried: " + itList.size());
                         }
+                        if (mAdapter != null) {
+                            mAdapter.setImageTextList(imageTextList);
+                        }
+                        updateParent();
                     }
 
                     @Override
@@ -450,12 +471,15 @@ public class EachMealFragment extends Fragment {
                 });
     }
 
-    public boolean containsImages() {
+    private boolean containsImages() {
         return imageTextList != null && !imageTextList.isEmpty();
     }
 
-    public void setImageTextList(List<ImageText> imageTextList) {
-        this.imageTextList = imageTextList;
+    private void updateParent() {
+        if (parentFragment != null) {
+            Logger.v(" Meal parent updated");
+            parentFragment.update();
+        }
     }
 
 }
