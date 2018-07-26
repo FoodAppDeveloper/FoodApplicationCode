@@ -22,12 +22,12 @@ public class Util {
     public static final int SATURDAY = 6;
     public static final int SUNDAY = 7;
 
-    public static final int BREAKFAST = 1;
-    public static final int MORNING_SNACK = 2;
-    public static final int LUNCH = 3;
-    public static final int AFTERNOON_SNACK = 4;
-    public static final int DINNER = 5;
-    public static final int EVENING_SNACK = 6;
+    public static final int BREAKFAST = 0;
+    public static final int MORNING_SNACK = 1;
+    public static final int LUNCH = 2;
+    public static final int AFTERNOON_SNACK = 3;
+    public static final int DINNER = 4;
+    public static final int EVENING_SNACK = 5;
 
     public static final String BREAKFAST_STRING = "Breakfast";
     public static final String MORNING_SNACK_STRING = "Snack (morning)";
@@ -36,12 +36,24 @@ public class Util {
     public static final String DINNER_STRING = "Dinner";
     public static final String EVENING_SNACK_STRING = "Snack (evening)";
 
+    // Identifiers for each meal. How "meal" is saved in database.
     public static final String BREAKFAST_FILE = "b";
     public static final String MORNING_SNACK_FILE = "ms";
     public static final String LUNCH_FILE = "l";
     public static final String AFTERNOON_SNACK_FILE = "as";
     public static final String DINNER_FILE = "d";
     public static final String EVENING_SNACK_FILE = "es";
+
+    // Time formats
+    public static final String TIMESTAMP_FORMAT = "hh:mm aaa";
+    public static final String DATE_FORMAT = "ddMMyy";
+
+    // File naming
+    public static final String TEXT_PREFIX = "TXT_";
+    public static final String TEXT_SUFFIX = ".txt";
+    public static final String IMAGE_PREFIX = "JPEG_";
+    public static final String IMAGE_SUFFIX = ".jpg";
+    public static final String TIME_FORMAT = "HHmmss";
 
     public static boolean isNetworkAvailable(Context ctx) {
         ConnectivityManager cm = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);

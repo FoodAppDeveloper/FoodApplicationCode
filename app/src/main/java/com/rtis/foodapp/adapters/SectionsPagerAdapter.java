@@ -3,11 +3,9 @@ package com.rtis.foodapp.adapters;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.util.Log;
 
 import com.rtis.foodapp.ui.fragments.EachDayFragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,6 +26,13 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         super(fm);
     }
 
+    /**
+     * Constructor
+     *
+     * @param fm the fragment manager
+     * @param swipeStrings List of Strings containing the name of the fragment
+     * @param dateStrings List of Strings containing date of fragment
+     */
     public SectionsPagerAdapter(FragmentManager fm, List<String> swipeStrings, List<String> dateStrings) {
         super(fm);
         this.swipeStrings = swipeStrings;

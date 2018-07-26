@@ -2,31 +2,38 @@ package com.rtis.foodapp.model;
 
 import com.backendless.BackendlessUser;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+/**
+ * BackendlessUser class to store data about each user in database.
+ */
 public class FoodAppUser extends BackendlessUser {
     private final String KEY_NAME = "name";
-    private final String KEY_PHONO = "phno";
+    private final String KEY_PHONE = "phone";
     private final String KEY_IS_PROFILE_PIC_AVAILABLE = "isProfilePicAvailable";
 
-   public FoodAppUser()
+    /**
+     * Empty Constructor
+     */
+    public FoodAppUser()
     {
-        // default constructor
+
     }
 
+    /**
+     * Initiate from user.
+     *
+     * @param user BackendlessUser to draw data from
+     */
     public FoodAppUser(BackendlessUser user)
     {
-        // user constructor
-
         setEmail(user.getEmail());
         setPassword(user.getPassword());
         setName((String) user.getProperty(KEY_NAME));
-        setPhoneNumber((String) user.getProperty(KEY_PHONO));
+        setPhoneNumber((String) user.getProperty(KEY_PHONE));
         setIsProfilePicAvailable((Boolean) user.getProperty(KEY_IS_PROFILE_PIC_AVAILABLE));
 
     }
+
+    /* Getters and Setters */
 
     public String getEmail() {
         return super.getEmail();
@@ -49,11 +56,11 @@ public class FoodAppUser extends BackendlessUser {
     }
 
     public String getPhoneNumber() {
-        return (String) super.getProperty(KEY_PHONO);
+        return (String) super.getProperty(KEY_PHONE);
     }
 
     public void setPhoneNumber(String phno) {
-        super.setProperty(KEY_PHONO, phno);
+        super.setProperty(KEY_PHONE, phno);
     }
 
     public boolean getIsProfilePicAvailable() {

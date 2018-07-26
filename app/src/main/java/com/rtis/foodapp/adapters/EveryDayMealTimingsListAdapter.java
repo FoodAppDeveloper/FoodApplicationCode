@@ -1,6 +1,5 @@
 package com.rtis.foodapp.adapters;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
@@ -12,25 +11,34 @@ import android.widget.TextView;
 
 import com.rtis.foodapp.R;
 import com.rtis.foodapp.model.MealTimeItems;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 /**
  * Created by rajul on 12/9/2016.
+ *
+ * Adapter class to display each meal fragment on each day fragment.
  */
+public class EveryDayMealTimingsListAdapter
+        extends RecyclerView.Adapter<EveryDayMealTimingsListAdapter.EachItemHolder> {
 
-public class EveryDayMealTimingsListAdapter extends RecyclerView.Adapter<EveryDayMealTimingsListAdapter.EachItemHolder>{
-
-    private Context mContext;
-    private LayoutInflater mLayoutInflater;
-
-    private List<MealTimeItems> mItems;
-
+    // Stores plate image to show on fragment
     private static Drawable d;
 
+    // View variables
+    private Context mContext;
+    private LayoutInflater mLayoutInflater;
     private View mView;
 
+    // Keep track of all the meal items
+    private List<MealTimeItems> mItems;
+
+    /**
+     * Constructor to initialize member variables.
+     *
+     * @param context the Context in which the adapter is in
+     * @param items List of MealTimeItems on the fragment page
+     */
     public EveryDayMealTimingsListAdapter(Context context, List<MealTimeItems> items) {
         mContext = context;
         mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -47,11 +55,12 @@ public class EveryDayMealTimingsListAdapter extends RecyclerView.Adapter<EveryDa
     @Override
     public EachItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         mView = mLayoutInflater.inflate(R.layout.each_time_list_item, parent, false);
-        // work here if you need to control height of your items
+        // work here if you need to control height of the items
         // keep in mind that parent is RecyclerView in this case
         int height = parent.getMeasuredHeight() / 3;
         mView.setMinimumHeight(height - 9);
-        mView.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, height - 9));
+        mView.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT,
+                height - 9));
 
         return new EachItemHolder(mView);
     }
@@ -63,9 +72,18 @@ public class EveryDayMealTimingsListAdapter extends RecyclerView.Adapter<EveryDa
         holder.fill(item.isFill());
     }
 
+    /**
+     * Static member class that contains the view of each meal fragment.
+     */
     public static class EachItemHolder extends RecyclerView.ViewHolder {
         public TextView txt_label;
         public ImageView imageView;
+
+        /**
+         * Constructor to set variables.
+         *
+         * @param itemView the View to set.
+         */
         public EachItemHolder(View itemView) {
             super(itemView);
 
@@ -73,6 +91,11 @@ public class EveryDayMealTimingsListAdapter extends RecyclerView.Adapter<EveryDa
             imageView = (ImageView) itemView.findViewById(R.id.eachMealImageView);
         }
 
+        /**
+         * Helper method to draw plate on fragment if needed.
+         *
+         * @param fill true if need be filled, false otherwise
+         */
         public void fill(boolean fill) {
             if (fill) {
                 imageView.setImageDrawable(d);
@@ -80,6 +103,5 @@ public class EveryDayMealTimingsListAdapter extends RecyclerView.Adapter<EveryDa
                 imageView.setImageDrawable(null);
             }
         }
-
     }
 }

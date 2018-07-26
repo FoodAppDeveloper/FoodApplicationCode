@@ -14,41 +14,18 @@ import java.util.Date;
  * Class that stores the image file and text file associated with it.
  * Implements Parcelable to save in EachMealFragment.
  */
-public class ImageText implements Parcelable {
+public class ImageText {
 
+    // Stores URL to image and text files
     private String imageFile;
     private String textFile;
-    private String meal;
-    private String fragmentDate;
-    private String objectId;
+
+    // Identifier variables
+    private String meal;            // See Utils for format
+    private String fragmentDate;    // ddMMyy
     private Date created;
-
-    /** Parcelable required methods */
-
-    public int describeContents() {
-        return 0;
-    }
-
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(imageFile);
-        dest.writeString(textFile);
-    }
-
-    public static final Parcelable.Creator<ImageText> CREATOR =
-            new Parcelable.Creator<ImageText>() {
-        public ImageText createFromParcel(Parcel in) {
-            return new ImageText(in);
-        }
-
-        public ImageText[] newArray(int size) {
-            return new ImageText[size];
-        }
-    };
-
-    private ImageText(Parcel in) {
-        imageFile = in.readString();
-        textFile = in.readString();
-    }
+    // Allows queuing multiple data objects with the same day and meal
+    private String objectId;
 
     /**
      * Empty constructor.

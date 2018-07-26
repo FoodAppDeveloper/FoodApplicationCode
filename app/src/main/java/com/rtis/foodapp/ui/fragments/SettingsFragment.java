@@ -12,14 +12,14 @@ import com.backendless.Backendless;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
 import com.rtis.foodapp.R;
-import com.rtis.foodapp.ui.MainActivity;
 import com.rtis.foodapp.ui.SplashActivity;
 
-import java.util.ArrayList;
-
+/**
+ * Fragment for settings page.
+ * Instantiated in Main Activity.
+ */
 public class SettingsFragment extends Fragment {
     public SettingsFragment() {
-
     }
 
     public static SettingsFragment newInstance() {
@@ -36,6 +36,7 @@ public class SettingsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.settings, container, false);
 
+        // Create Logout button
         Button logout = (Button) view.findViewById(R.id.logout);
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,6 +48,9 @@ public class SettingsFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Helper method to log user out of account when button is pressed.
+     */
     private void logout() {
         Backendless.UserService.logout(new AsyncCallback<Void>() {
             public void handleResponse(Void response) {

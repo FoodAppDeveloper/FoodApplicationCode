@@ -53,25 +53,35 @@ public class EachMealFragment extends Fragment {
     // Constant for image capturing
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
-    private String mCurrentPhotoPath = "null";
-    private PopupWindow mPopupWindow;
-    private ViewPager mViewPager;
-    private SwipeSelector swipeSelector;
-    private Uri mCurrentPhotoUri;
-    private File mCurrentFile;
-    private EachMealSectionAdapter mAdapter;
-    private int currentPos;
-    private EachDayFragment parentFragment;
-    private MealTimeItems mealItem;
-
-    // List of imageText objects stored in the fragment
-    private List<ImageText> imageTextList;
+    // Used for file name substring
+    static final int IMAGETEXT_LENGTH = 9;
 
     // Fragment identifiers
     private static final String ARG_MEAL = "meal";
     private static final String ARG_DATE = "date";
     private String meal;
     private String date;
+
+    // Fragment view variables
+    private PopupWindow mPopupWindow;
+    private ViewPager mViewPager;
+    private SwipeSelector swipeSelector;
+    private EachMealSectionAdapter mAdapter;
+
+    // Image capture variables
+    private String mCurrentPhotoPath;
+    private Uri mCurrentPhotoUri;
+    private File mCurrentFile;
+
+    // Variables called upon to update view
+    private EachDayFragment parentFragment;
+    private MealTimeItems mealItem;
+
+    // List of imageText objects stored in the fragment
+    private List<ImageText> imageTextList;
+
+    // Keeps track of ImageText
+    private int currentPos;
 
     /**
      * Empty Constructor
@@ -82,8 +92,8 @@ public class EachMealFragment extends Fragment {
     /**
      * Creates a new instance of EachMealFragment using parameters
      *
-     * @param meal the meal the fragment belongs to
-     * @param date the date identifier for the fragment
+     * @param meal the String meal the fragment belongs to
+     * @param date the String date identifier for the fragment
      * @return A new instance of fragment EachMealFragment
      */
     public static EachMealFragment newInstance(String meal, String date) {
@@ -95,6 +105,14 @@ public class EachMealFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Method called along with newInstance to populate global variables.
+     *
+     * @param meal the String meal the fragment belongs to
+     * @param date the String date identifier for the fragment
+     * @param fragment the parent EachDayFragment this fragment belongs to
+     * @param item the MealTimeItems associated with this meal fragment
+     */
     public void setUp(String meal, String date, EachDayFragment fragment, MealTimeItems item) {
         this.meal = meal;
         this.date = date;
@@ -106,7 +124,6 @@ public class EachMealFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList("imageTextFiles", (ArrayList) imageTextList);
     }
 
     /**
@@ -122,32 +139,20 @@ public class EachMealFragment extends Fragment {
             meal = getArguments().getString(ARG_MEAL);
         }
 
-        // Set from previous state or queries database.
-        /*if (savedInstanceState != null) {
-            imageTextList = savedInstanceState.getParcelableArrayList("imageTextFiles");
-        } else {
-            queryImageText();
-        }*/
         queryImageText();
 
         currentPos = 0;
-
     }
 
-    /**
-     *
-     * @param inflater
-     * @param container
-     * @param savedInstanceState
-     * @return
-     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View customView = inflater.inflate(R.layout.captured_meal_popup, container, false);
+        View customView = inflater.inflate(R.layout.captured_meal_popup, container,
+                false);
         queryImageText();
 
+        // Shows camera if no images associated with this meal, otherwise show images
         if (!containsImages()) {
             dispatchTakePictureIntent();
         } else {
@@ -163,7 +168,7 @@ public class EachMealFragment extends Fragment {
     }
 
     public void mealClicked() {
-        //queryImageText();
+        // Shows camera if no images associated with this meal, otherwise show images
         if (!containsImages()) {
             dispatchTakePictureIntent();
         } else {
@@ -171,9 +176,13 @@ public class EachMealFragment extends Fragment {
         }
     }
 
+    /**
+     * Show popup window to display images in that meal.
+     */
     private void showPopUp() {
         // Initialize a new instance of LayoutInflater service
-        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(
+                LAYOUT_INFLATER_SERVICE);
 
         // Inflate the custom layout/view
         final View customView = inflater.inflate(R.layout.captured_meal_popup, null);
@@ -191,6 +200,7 @@ public class EachMealFragment extends Fragment {
             mPopupWindow.setElevation(5.0f);
         }
 
+        // Initiate up SwipeSelector and its items
         swipeSelector = (SwipeSelector) customView.findViewById(R.id.eachMealselector);
         SwipeItem[] swipeItems = new SwipeItem[imageTextList.size()];
         for (int i = 0; i < imageTextList.size(); i++) {
@@ -198,16 +208,18 @@ public class EachMealFragment extends Fragment {
         }
         swipeSelector.setItems(swipeItems);
 
-        // Get a reference for the custom view close button
+        // Get a reference for the custom view buttons
         ImageButton closeButton = (ImageButton) customView.findViewById(R.id.close_popup);
         ImageButton cameraButton = (ImageButton) customView.findViewById(R.id.take_picture);
-        RelativeLayout mLayout = (RelativeLayout) customView.findViewById(R.id.popup_1);
         Button deleteButton = (Button) customView.findViewById(R.id.delete_button);
 
+        // Initiate layout, view, and adapter
+        RelativeLayout mLayout = (RelativeLayout) customView.findViewById(R.id.popup_1);
         mViewPager = (ViewPager) customView.findViewById(R.id.eachMealViewPager);
-        mAdapter = new EachMealSectionAdapter(getContext(), imageTextList, meal, date);
+        mAdapter = new EachMealSectionAdapter(getContext(), imageTextList);
         mViewPager.setAdapter(mAdapter);
 
+        // Change pager position
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset,
@@ -224,7 +236,6 @@ public class EachMealFragment extends Fragment {
             public void onPageScrollStateChanged(int state) { }
         });
 
-
         // Set a click listener for the take picture button
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -238,11 +249,11 @@ public class EachMealFragment extends Fragment {
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Dismiss the popup window
                 mPopupWindow.dismiss();
             }
         });
 
+        // Set a click listener for delete button
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -251,11 +262,13 @@ public class EachMealFragment extends Fragment {
         });
 
         mPopupWindow.showAtLocation(mLayout, Gravity.CENTER, 0, 0);
-
     }
 
     /* Deal with Camera */
 
+    /**
+     * Brings up phone's camera
+     */
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
@@ -282,16 +295,24 @@ public class EachMealFragment extends Fragment {
         }
     }
 
+    /**
+     * Helper method to create image file in storage.
+     *
+     * @return
+     * @throws IOException
+     */
     private File createImageFile() throws IOException {
         // Create an image file name
-        String timeStamp = new SimpleDateFormat("HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + date + timeStamp + "_" + meal + "_";
+        // Format: JPEG_<ddMMyyHHmmss>_<meal>_<unique#>.jpg
+        String timeStamp = new SimpleDateFormat(Util.TIME_FORMAT).format(new Date());
+        String imageFileName = Util.IMAGE_PREFIX + date + timeStamp + "_" + meal + "_";
         File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
-                imageFileName,   /* prefix */
-                ".jpg",   /* suffix */
-                storageDir      /* directory */
+                imageFileName,          /* prefix */
+                Util.IMAGE_SUFFIX,      /* suffix */
+                storageDir              /* directory */
         );
+
         //File image = new File(storageDir, imageFileName + ".jpg");
         mCurrentFile = image;
 
@@ -301,22 +322,35 @@ public class EachMealFragment extends Fragment {
         return image;
     }
 
-    // Gets called after dispatchTakePictureIntent
+    /**
+     * Method to handle camera activity. Uploads image to cloud once picture is
+     * taken and accepted.
+     * Called after dispatchTakePictureIntent
+     *
+     * @param requestCode code for request type
+     * @param resultCode code for result type
+     * @param data data stored in take picture intent
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            // Initiate imageTextList and add new object
             if (imageTextList == null) {
                 imageTextList = new ArrayList<>();
             }
             imageTextList.add(new ImageText(meal, date));
-            uploadImageFile(imageTextList.size() - 1); // point to last added element
 
+            // point to last added element for update
+            uploadImageFile(imageTextList.size() - 1);
+
+            // update adapter view
             if(mViewPager != null) {
                 mViewPager.getAdapter().notifyDataSetChanged();
             }
-            showPopUp();
 
+            showPopUp();
         }
     }
 
@@ -356,12 +390,19 @@ public class EachMealFragment extends Fragment {
         });
     }
 
+    /**
+     * Method to delete the ImageText object and associated files in the database.
+     * Updates fragment view.
+     *
+     * @param position the position of the ImageText to delete
+     */
     private void deleteImageText(final int position) {
-        // deletes database object and deletes files
+        // Get file name according to format <path>/<filename>
         ImageText it = imageTextList.get(position);
-        int splitIndex = it.getImageFile().lastIndexOf('/') - 9;
+        int splitIndex = it.getImageFile().lastIndexOf('/') - IMAGETEXT_LENGTH;
         String fileName = it.getImageFile().substring(splitIndex);
 
+        /* Delete image file */
         Backendless.Files.remove(fileName, new AsyncCallback<Void>() {
             @Override
             public void handleResponse(Void response) {
@@ -370,7 +411,7 @@ public class EachMealFragment extends Fragment {
                 /* Delete text File if exists */
                 if (!imageTextList.get(position).isTextEmpty()) {
                     ImageText it = imageTextList.get(position);
-                    int splitIndex = it.getTextFile().lastIndexOf('/') - 9;
+                    int splitIndex = it.getTextFile().lastIndexOf('/') - IMAGETEXT_LENGTH;
                     String fileName = it.getTextFile().substring(splitIndex);
 
                     Backendless.Files.remove(fileName, new AsyncCallback<Void>() {
@@ -378,6 +419,7 @@ public class EachMealFragment extends Fragment {
                         public void handleResponse(Void response) {
                             Logger.v("Deleted Text File");
 
+                            // Finally, delete object
                             deleteObject(position);
                         }
 
@@ -389,6 +431,7 @@ public class EachMealFragment extends Fragment {
                         }
                     });
                 } else {
+                    // Finally, delete object
                     deleteObject(position);
                 }
             }
@@ -398,7 +441,6 @@ public class EachMealFragment extends Fragment {
                 Logger.v(" Delete Image File Failed fault " +  fault.toString());
                 Logger.v(" Delete Image File Failed " + fault.getDetail());
                 Logger.v(" Delete Image File Failed message " + fault.getMessage());
-                Logger.v( " Image File URL: " + imageTextList.get(position).getImageFile());
             }
         });
 
@@ -415,12 +457,17 @@ public class EachMealFragment extends Fragment {
                     @Override
                     public void handleResponse(Long response) {
                         Logger.v("Deleted ImageText Object: " + response.toString());
+
+                        // Remove from local list and update view
                         imageTextList.remove(position);
                         mAdapter.setImageTextList(imageTextList);
+
+                        // Clear popup if no more images, otherwise show again
                         mPopupWindow.dismiss();
                         if (containsImages()) {
                             showPopUp();
                         } else {
+                            // Update fragment view
                             mealItem.setFill(false);
                             updateParent();
                         }
@@ -435,28 +482,37 @@ public class EachMealFragment extends Fragment {
                 });
     }
 
+    /**
+     * Queries ImageText objects from database and updates view.
+     */
     public void queryImageText() {
+        /* Create a where clause identifying all database objects associated with current user,
+        fragment date, and meal */
         String whereClause = "ownerId = '" + Backendless.UserService.CurrentUser().getUserId() +
                 "' and fragmentDate = '" + date + "' and meal = '" + meal + "'";
         DataQueryBuilder queryBuilder = DataQueryBuilder.create();
         queryBuilder.setWhereClause(whereClause);
+
         Backendless.Data.of(ImageText.class).find(queryBuilder,
                 new AsyncCallback<List<ImageText>>() {
                     @Override
                     public void handleResponse(final List<ImageText> itList) {
                         imageTextList = itList;
                         if(!containsImages()) {
-                            Logger.v(" No Image Files Queried.");
+                            // set item view fill to false
                             if (mealItem != null) {
                                 mealItem.setFill(false);
                             }
+                            Logger.v(" No Image Files Queried.");
                         } else {
+                            // set item view fill to true
                             if (mealItem != null) {
-                                Logger.v(" Meal Item set to true");
                                 mealItem.setFill(true);
                             }
                             Logger.v(" Number of image files queried: " + itList.size());
                         }
+
+                        // Update view
                         if (mAdapter != null) {
                             mAdapter.setImageTextList(imageTextList);
                         }
@@ -471,13 +527,20 @@ public class EachMealFragment extends Fragment {
                 });
     }
 
+    /**
+     * Helper method to determine whether this fragment contains images.
+     *
+     * @return
+     */
     private boolean containsImages() {
         return imageTextList != null && !imageTextList.isEmpty();
     }
 
+    /**
+     * Helper method to update parent fragment view.
+     */
     private void updateParent() {
         if (parentFragment != null) {
-            Logger.v(" Meal parent updated");
             parentFragment.update();
         }
     }
