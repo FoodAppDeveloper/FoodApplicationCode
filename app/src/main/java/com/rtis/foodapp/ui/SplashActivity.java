@@ -68,8 +68,6 @@ public class SplashActivity extends AppCompatActivity {
         }
         Logger.v("Splash init end");
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-
-        Backendless.Data.mapTableToClass("FoodData", ImageText.class);
     }
 
     @Override

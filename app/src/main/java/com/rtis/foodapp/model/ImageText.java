@@ -1,7 +1,6 @@
 package com.rtis.foodapp.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.media.Image;
 
 import com.backendless.Backendless;
 import com.backendless.async.callback.AsyncCallback;
@@ -33,6 +32,7 @@ public class ImageText {
     public ImageText() {
         imageFile = "";
         textFile = "";
+
     }
 
     /**
@@ -46,6 +46,7 @@ public class ImageText {
         textFile = "";
         this.meal = meal;
         this.fragmentDate = date;
+
     }
 
     /**

@@ -10,11 +10,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.backendless.Backendless;
 import com.roughike.swipeselector.OnSwipeItemSelectedListener;
 import com.roughike.swipeselector.SwipeItem;
 import com.roughike.swipeselector.SwipeSelector;
 import com.rtis.foodapp.R;
 import com.rtis.foodapp.adapters.SectionsPagerAdapter;
+import com.rtis.foodapp.model.ImageText;
 import com.rtis.foodapp.ui.fragments.SettingsFragment;
 import com.rtis.foodapp.utils.Util;
 
@@ -43,6 +45,9 @@ public class MainActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Map ImageText object to FoodData data table
+        Backendless.Data.mapTableToClass( "FoodData", ImageText.class);
 
         // Initialize the current week date values and fragment date names
         mDayNames = new DateFormatSymbols().getWeekdays();
