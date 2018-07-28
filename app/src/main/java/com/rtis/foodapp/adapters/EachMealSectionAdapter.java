@@ -19,6 +19,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.backendless.Backendless;
+import com.backendless.BackendlessUser;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.files.BackendlessFile;
@@ -232,7 +233,9 @@ public class EachMealSectionAdapter extends PagerAdapter {
      * @param position the position of ImageText in list to save text file for
      */
     private void uploadTextFile(final int position) {
-        Backendless.Files.upload(mCurrentFile, Defaults.FILES_IMAGETEXT_DIRECTORY, true,
+        String directory = Defaults.FILES_IMAGETEXT_DIRECTORY + "/"
+                + Backendless.UserService.CurrentUser().getEmail();
+        Backendless.Files.upload(mCurrentFile, directory, true,
                 new AsyncCallback<BackendlessFile>() {
             @Override
             public void handleResponse(final BackendlessFile backendlessFile) {
@@ -243,6 +246,7 @@ public class EachMealSectionAdapter extends PagerAdapter {
 
                 // delete temporary local file
                 mCurrentFile.delete();
+
             }
 
             @Override

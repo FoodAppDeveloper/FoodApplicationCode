@@ -36,6 +36,7 @@ import com.rtis.foodapp.utils.Util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -53,8 +54,8 @@ public class EachMealFragment extends Fragment {
     // Constant for image capturing
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
-    // Used for file name substring
-    static final int IMAGETEXT_LENGTH = 9;
+    // Constant for imageText directory name
+    static final String IMAGETEXT_DIR = "imageText";
 
     // Fragment identifiers
     private static final String ARG_MEAL = "meal";
@@ -360,8 +361,9 @@ public class EachMealFragment extends Fragment {
      * @param position the position of the imageText in list
      */
     private void uploadImageFile(final int position) {
-        Backendless.Files.upload(mCurrentFile, Defaults.FILES_IMAGETEXT_DIRECTORY,
-                new AsyncCallback<BackendlessFile>() {
+        String directory = Defaults.FILES_IMAGETEXT_DIRECTORY + "/"
+                + Backendless.UserService.CurrentUser().getEmail();
+        Backendless.Files.upload(mCurrentFile, directory, new AsyncCallback<BackendlessFile>() {
 
             @Override
             public void handleResponse(BackendlessFile backendlessFile) {
@@ -397,10 +399,22 @@ public class EachMealFragment extends Fragment {
      * @param position the position of the ImageText to delete
      */
     private void deleteImageText(final int position) {
-        // Get file name according to format <path>/<filename>
+        // Get file name according to format imageText/<user_email>/<filename>
         ImageText it = imageTextList.get(position);
-        int splitIndex = it.getImageFile().lastIndexOf('/') - IMAGETEXT_LENGTH;
-        String fileName = it.getImageFile().substring(splitIndex);
+        int splitIndex = it.getImageFile().indexOf(IMAGETEXT_DIR);
+
+        String fileName;
+        try {
+            // Decode URL format
+            fileName = java.net.URLDecoder.decode(it.getImageFile().substring(splitIndex), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // Manually filter out at least the "@"
+            fileName = it.getTextFile().substring(splitIndex).
+                    replace("%40", "@");
+        } catch (StringIndexOutOfBoundsException e) {
+            // Known occurrence: User deletes image before it uploads
+            return;
+        }
 
         /* Delete image file */
         Backendless.Files.remove(fileName, new AsyncCallback<Void>() {
@@ -411,8 +425,17 @@ public class EachMealFragment extends Fragment {
                 /* Delete text File if exists */
                 if (!imageTextList.get(position).isTextEmpty()) {
                     ImageText it = imageTextList.get(position);
-                    int splitIndex = it.getTextFile().lastIndexOf('/') - IMAGETEXT_LENGTH;
-                    String fileName = it.getTextFile().substring(splitIndex);
+                    int splitIndex = it.getImageFile().indexOf(IMAGETEXT_DIR);
+
+                    String fileName;
+                    try {
+                        fileName = java.net.URLDecoder.decode(it.getTextFile().substring(splitIndex), "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        fileName = it.getTextFile().substring(splitIndex).
+                                replace("%40", "@");
+                    } catch (StringIndexOutOfBoundsException e) {
+                        return;
+                    }
 
                     Backendless.Files.remove(fileName, new AsyncCallback<Void>() {
                         @Override
