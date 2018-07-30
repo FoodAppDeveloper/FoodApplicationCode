@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity{
         Calendar calendar = new GregorianCalendar();
         Calendar currentDate = Calendar.getInstance(Locale.US);
         calendar.setTime(currentDate.getTime());
-        int currentDay = calendar.get(Calendar.DAY_OF_WEEK);
+        final int currentDay = calendar.get(Calendar.DAY_OF_WEEK);
         for (int i = Calendar.SUNDAY; i <= Calendar.SATURDAY; i++) {
             calendar.set(Calendar.DAY_OF_WEEK, i);
 
@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity{
                 new SwipeItem(Util.SATURDAY, swipeStrings.get(5), ""),
                 new SwipeItem(Util.SUNDAY, swipeStrings.get(6), "")
         );
-        mViewPager.setCurrentItem(currentDay - 1);
+        mViewPager.setCurrentItem(currentDay - 1); // set to index of today
 
         // Swipe listener
         swipeSelector.setOnItemSelectedListener(new OnSwipeItemSelectedListener() {
@@ -147,6 +147,9 @@ public class MainActivity extends AppCompatActivity{
                                     transaction.commit();
 
                                     currentFragment = null;
+                                } else if (currentFragment == null) {
+                                    // Go to today's page
+                                    mViewPager.setCurrentItem(currentDay - 1);
                                 }
                                 break;
                             case R.id.tab_coach:

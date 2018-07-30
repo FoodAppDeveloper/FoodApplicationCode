@@ -212,7 +212,7 @@ public class EachMealFragment extends Fragment {
         // Get a reference for the custom view buttons
         ImageButton closeButton = (ImageButton) customView.findViewById(R.id.close_popup);
         ImageButton cameraButton = (ImageButton) customView.findViewById(R.id.take_picture);
-        Button deleteButton = (Button) customView.findViewById(R.id.delete_button);
+        ImageButton deleteButton = (ImageButton) customView.findViewById(R.id.delete_button);
 
         // Initiate layout, view, and adapter
         RelativeLayout mLayout = (RelativeLayout) customView.findViewById(R.id.popup_1);

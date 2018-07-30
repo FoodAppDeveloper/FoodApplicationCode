@@ -19,7 +19,6 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.backendless.Backendless;
-import com.backendless.BackendlessUser;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.files.BackendlessFile;
@@ -81,7 +80,7 @@ public class EachMealSectionAdapter extends PagerAdapter {
     @Override
     public Object instantiateItem(ViewGroup collection, final int position) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        ViewGroup layout = (ViewGroup) inflater.inflate(R.layout.demo, collection, false);
+        ViewGroup layout = (ViewGroup) inflater.inflate(R.layout.imagetext_display, collection, false);
         collection.addView(layout);
 
         // Set up text view to display loading state of image

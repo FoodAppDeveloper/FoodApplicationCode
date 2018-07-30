@@ -22,18 +22,6 @@
         android:layout_below="@id/delete_button"
        >
 
-        <!--<ImageView
-            android:id="@+id/captured_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentTop="true"
-            android:layout_marginBottom="60dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="10dp"
-            android:scaleType="fitXY"
-            />-->
-
         <android.support.v4.view.ViewPager
             android:id="@+id/eachMealViewPager"
             android:layout_width="match_parent"
@@ -43,33 +31,18 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
            />
 
-        <!--<android.support.v7.widget.RecyclerView-->
-            <!--android:id="@+id/eachMealList"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:layout_marginBottom="40dp"-->
-            <!--android:background="@color/white"-->
-           <!--/>-->
     </com.roughike.swipeselector.SwipeSelector>
-
-    <!--<ImageView-->
-        <!--android:layout_width="300dp"-->
-        <!--android:layout_height="250dp"-->
-        <!--android:id="@+id/pop_imageView"-->
-        <!--android:scaleType="centerCrop"-->
-        <!--android:layout_centerInParent="true"-->
-       <!--/>-->
 
     <ImageButton
         android:id="@+id/take_picture"
-        android:layout_width="58dp"
-        android:layout_height="47dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:adjustViewBounds="false"
         android:cropToPadding="false"
         android:scaleType="centerCrop"
-        android:src="@drawable/camera" />
+        android:src="@android:drawable/ic_menu_camera" />
 
     <ImageButton
         android:id="@+id/close_popup"
@@ -79,12 +52,12 @@
         android:layout_centerHorizontal="true"
         android:src="@drawable/ic_close_dark" />
 
-    <Button
+    <ImageButton
         android:id="@+id/delete_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:text="Delete" />
+        android:src="@android:drawable/ic_menu_delete" />
 
 </RelativeLayout>
