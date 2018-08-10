@@ -13,6 +13,7 @@ Tested with Android API level 24
 2. Clone the repository and open in Android Studio.
 3. Allow program to build and if there are error messages about version and asking to install components, download/install them by pressing the underlined text in the build message.
 4. Run the app by pressing the play button and select the deployment type.
+
 A more detailed explanation can be found on the [Android Developers website](https://developer.android.com/studio/run/).
 
 ## APKs
