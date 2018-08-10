@@ -1,5 +1,6 @@
 # FoodApp
 FoodApp is an Android app for tracking daily meals. In order to encourage people to eat healthier, the vision of this app is to provide tips on healthy eating habits. Each user creates an account in order to save their meals and get personalized feedback.
+
 This app is used in a research project about the changing eating habits of Filipinos when moving to the US.
 
 ## Built With
