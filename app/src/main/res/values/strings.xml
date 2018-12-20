@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">FoodApp</string>
+    <string name="app_name">MySnapFoodLog</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -45,7 +45,15 @@
     <!--Settings Page-->
     <string name="logout">Logout</string>
     <string name="help_title">Help and Support</string>
-    <string name="contact_info">Call: ##########\nEmail: ---</string>
+    <string name="contact_info">Call: 702-895-5746\nEmail: foodappdevelopers@gmail.com</string>
+    <string name="help_phone">Call: 702&#8211;895&#8211;5746</string>
+    <string name="help_phone_uri">tel:6199130909</string>
+    <string name="help_email">Email: foodappdevelopers@gmail.com</string>
+    <string name="help_email_uri">foodappdevelopers@gmail.com</string>
     <string name="rate">Rate us! </string>
+    <string name="tips">Tips</string>
+    <string name="today">Today</string>
+    <string name="coach">Coach</string>
+    <string name="settings">Settings</string>
 
 </resources>

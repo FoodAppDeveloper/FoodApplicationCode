@@ -116,13 +116,12 @@ public class ImageText {
     public static void saveImageText(ImageText it) {
         Backendless.Data.of(ImageText.class).save(it, new AsyncCallback<ImageText>() {
             @Override
-            public void handleResponse(ImageText response) {
-                Logger.v(" ImageText object saved ");
+            public void handleResponse(ImageText response) { Logger.v("ImageText.java", " ImageText object saved ");
             }
 
             @Override
             public void handleFault(BackendlessFault fault) {
-                Logger.v(" ImageText Save Failed: " + fault.getMessage());
+                Logger.v("ImageText.java", " ImageText Save Failed: " + fault.getMessage());
             }
         });
     }
@@ -137,12 +136,12 @@ public class ImageText {
         {
             @Override
             public void handleResponse( ImageText person ) {
-                Logger.v(" ImageText object updated ");
+                Logger.v("ImageText.java"," ImageText object updated ");
             }
 
             @Override
             public void handleFault( BackendlessFault fault ) {
-                Logger.v(" ImageText Update Failed: " + fault.getMessage());
+                Logger.v("ImageText.java"," ImageText Update Failed: " + fault.getMessage());
             }
         } );
 

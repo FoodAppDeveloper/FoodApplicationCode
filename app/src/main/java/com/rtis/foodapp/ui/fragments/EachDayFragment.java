@@ -76,7 +76,7 @@ public class EachDayFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mCurrentPageName = getArguments().getString(ARG_SECTION_NAME);
         dateString = getArguments().getString(ARG_SECTION_DATE);
-        Log.v("Fragment", mCurrentPageName + " Created");
+        Log.v("Fragment:onCreate()", mCurrentPageName + " Created date="+dateString);
     }
 
     @Override
@@ -114,34 +114,41 @@ public class EachDayFragment extends Fragment {
         // Populate and set up EachMealFragment list
         mealFragments = new ArrayList<>();
 
+        Log.v("EDF:onCreateView()", dateString + " create meals");
         EachMealFragment breakfast = EachMealFragment.newInstance(Util.BREAKFAST_FILE,
                 dateString);
+        //Log.v("EDF", dateString + " create breakfast");
         breakfast.setUp(Util.BREAKFAST_FILE, dateString, this,
                 mItems.get(Util.BREAKFAST));
         mealFragments.add(breakfast);
 
         EachMealFragment mornSnack = EachMealFragment.newInstance(Util.MORNING_SNACK_FILE,
                 dateString);
+        //Log.v("EDF", dateString + " create breakfast snack");
         mornSnack.setUp(Util.MORNING_SNACK_FILE, dateString, this,
                 mItems.get(Util.MORNING_SNACK));
         mealFragments.add(mornSnack);
 
         EachMealFragment lunch = EachMealFragment.newInstance(Util.LUNCH_FILE, dateString);
+        //Log.v("EDF", dateString + " create lunch");
         lunch.setUp(Util.LUNCH_FILE, dateString, this, mItems.get(Util.LUNCH));
         mealFragments.add(lunch);
 
         EachMealFragment afterSnack = EachMealFragment.newInstance(Util.AFTERNOON_SNACK_FILE,
                 dateString);
+        //Log.v("EDF", dateString + " create lunch snack");
         afterSnack.setUp(Util.AFTERNOON_SNACK_FILE, dateString, this,
                 mItems.get(Util.AFTERNOON_SNACK));
         mealFragments.add(afterSnack);
 
         EachMealFragment dinner = EachMealFragment.newInstance(Util.DINNER_FILE, dateString);
+        //Log.v("EDF", dateString + " create dinner");
         dinner.setUp(Util.DINNER_FILE, dateString, this, mItems.get(Util.DINNER));
         mealFragments.add(dinner);
 
         EachMealFragment evenSnack = EachMealFragment.newInstance(Util.EVENING_SNACK_FILE,
                 dateString);
+        //Log.v("EDF", dateString + " create dinner snack");
         evenSnack.setUp(Util.EVENING_SNACK_FILE, dateString, this,
                 mItems.get(Util.EVENING_SNACK));
         mealFragments.add(evenSnack);
@@ -159,14 +166,14 @@ public class EachDayFragment extends Fragment {
             @Override
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
                 // Position is recorded as position of selected meal in List
-                Log.v("EachList", mCurrentPageName + " " + position);
+                Log.v("EDF", "EachList" + mCurrentPageName + " " + position);
 
                 if (!mealFragments.get(position).isAdded()) {
                     getActivity().getSupportFragmentManager().beginTransaction()
                             .add(mealFragments.get(position), "meal_fragment")
                             .addToBackStack(null)
                             .commit();
-                    Log.v("Adding Meal Fragment: ", Integer.toString(position));
+                    Log.v("EDF", "Adding Meal Fragment: " + Integer.toString(position));
                 } else {
                     mealFragments.get(position).mealClicked();
                 }

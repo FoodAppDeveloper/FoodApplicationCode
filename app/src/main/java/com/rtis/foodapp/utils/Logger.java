@@ -42,7 +42,7 @@ public class Logger
 	{
 		if( BuildConfig.DEBUG && LOGGING_ENABLED )
 		{
-			Log.v(tag, "" + content);
+			Log.v(tag, ": " + content);
 		}
 	}
 

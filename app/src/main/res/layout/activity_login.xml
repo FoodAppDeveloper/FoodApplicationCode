@@ -59,56 +59,58 @@
                     android:imeActionLabel="@string/action_sign_in_short"
                     android:imeOptions="actionUnspecified"
                     android:inputType="textPassword"
-                    android:maxLines="1" />
+                    android:maxLines="1"
+                    android:selectAllOnFocus="false"
+                    android:singleLine="false" />
 
             </android.support.design.widget.TextInputLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginTop="20dp"
-            >
-            <CheckBox
-                android:id="@+id/rememberLoginBox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/remember_login_text"
-                android:gravity="center"
-                android:layout_gravity="center_vertical"
-                android:layout_marginRight="10dp"
-               />
-            <Button
-                android:id="@+id/email_sign_in_button"
-                style="?android:textAppearanceSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/action_sign_in"
-                android:textStyle="bold"
-                android:layout_marginLeft="10dp"/>
-            </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
                 android:layout_marginTop="20dp"
-               >
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/rememberLoginBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="10dp"
+                    android:gravity="center"
+                    android:text="@string/remember_login_text" />
+
+                <Button
+                    android:id="@+id/email_sign_in_button"
+                    style="?android:textAppearanceSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/action_sign_in"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
                 <Button
                     android:id="@+id/email_register_button"
                     style="?android:textAppearanceSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
                     android:text="@string/action_register"
-                    android:textStyle="bold"
-                    android:layout_marginRight="5dp"/>
+                    android:textStyle="bold" />
 
-                <com.google.android.gms.common.SignInButton
+                <!--<com.google.android.gms.common.SignInButton
                     android:id="@+id/btn_sign_in"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    />
+                -->    android:layout_height="wrap_content" />
             </LinearLayout>
 
         </LinearLayout>

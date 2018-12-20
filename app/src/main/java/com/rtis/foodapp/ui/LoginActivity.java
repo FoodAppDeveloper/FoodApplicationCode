@@ -116,7 +116,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         Button mRegisterButton=(Button)findViewById(R.id.email_register_button);
         mRegisterButton.setOnClickListener(this);
 
-        btn_google_signIn = (SignInButton) findViewById(R.id.btn_sign_in);
+        /*btn_google_signIn = (SignInButton) findViewById(R.id.btn_sign_in);
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail().requestProfile().requestId().requestIdToken(Defaults.SERVER_CLIENT_ID)
                 .build();
@@ -129,7 +129,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // Customizing G+ button
         btn_google_signIn.setSize(SignInButton.SIZE_STANDARD);
         btn_google_signIn.setScopes(gso.getScopeArray());
-        btn_google_signIn.setOnClickListener(this);
+        btn_google_signIn.setOnClickListener(this);*/
 
         // this login activity has been started by registration activity and hence try to login with th bundle details
         Bundle dataFromRegistration=getIntent().getExtras();
@@ -379,10 +379,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         int id = v.getId();
 
         switch (id) {
-            case R.id.btn_sign_in:
+            /*case R.id.btn_sign_in:
                 googlePlusSignIn();
                 break;
-            case R.id. email_register_button:
+            */case R.id. email_register_button:
                 startActivity(new Intent(LoginActivity.this,RegisterActivity.class));
                 break;
         }

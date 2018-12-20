@@ -3,6 +3,7 @@ Records current progress and future work for the project
 
 ## Progress
 The master branch is up to date with the most recent code.
+
 ### On branch 'camera'
 * Updated Backendless version by adding 'implementation 'com.backendless:backendless:5.0.+' to build.gradle
    * Full code differences shown in [Backendless documentation](https://backendless.com/docs/android/doc.html#dynanchor1)
@@ -10,7 +11,7 @@ The master branch is up to date with the most recent code.
 * Method to add comments to image and saves separate text file to Backendless database
 * Query/Delete images and text files from Backendless database
 * Displays multiple images with option to take another image for the same meal
-* File system where image file has the same name as text file but with different extention and prefix
+* File system where image file has the same name as text file but with different extension and prefix
 * Plate image indicates whether or not the meal has images associated with it already
 * Implemented bottom bar functionality for "Today" and "Settings"
    * Settings current has logout option
@@ -18,6 +19,8 @@ The master branch is up to date with the most recent code.
 * Timestamp of image is the time the image was taken
 
 New files:
+* SectionStatePagerAdapter.java
+
 * ImageText.java
 * SettingsFragment.java
 * EachMealSectionAdapter.java
@@ -29,6 +32,12 @@ New files:
 * bottombar.xml
 
 ## TODO
+- [ ] Modify SectionStatePagerAdapter further to handle Today bottombar button (must reload completely).
+- [ ] Local version to save and display images faster while uploading to cloud in background
+- [ ] Add rating system
+- [ ] Figure out why Google SignIn doesn't work and fix
+- [ ] Handle screen rotation
+
 - [ ] Add rating system and contact info
 - [ ] Figure out why Google SignIn doesn't work and fix
 - [ ] Local version to save and display images faster while uploading to cloud in background

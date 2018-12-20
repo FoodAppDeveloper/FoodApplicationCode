@@ -41,6 +41,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import static com.rtis.foodapp.BuildConfig.DEBUG;
+
 /**
  * Created by rajul on 1/14/2017.
  *
@@ -268,12 +270,33 @@ public class EachMealSectionAdapter extends PagerAdapter {
         String fileURL = imageTextList.get(position).getImageFile();
 
         if (!fileURL.isEmpty()) {
-            // Picasso auto rotates portrait images, so rotate back
-            Picasso.with(mContext).load(fileURL).rotate(ROTATE_DEGREES).into(mImageView);
-            Logger.v(" Image File URL: ", fileURL);
-            Logger.v(" Number of image files: " + imageTextList.size());
+            uploadTextView.setText(R.string.loading_message);
+
+            //https://guides.codepath.com/android/Displaying-Images-with-the-Picasso-Library
+            //progressBar.setVisibility(View.VISIBLE)
+
+            // note this usage of Picasso manages a single instance of Picasso - should this have on shared across each meal section?
+            // Picasso auto rotates portrait images, so rotate back - also adjusting image size to fit view
+            Logger.v("EMSA", "Picasso start load");
+            //Picasso.with(mContext).load(fileURL).fit().centerInside().rotate(ROTATE_DEGREES).into(mImageView);
+
+            //181015 not sure about this because image seems to be rotated incorrectly on Nexus6P
+            Picasso.with(mContext).load(fileURL).rotate(0).into(mImageView);
+
+            //icon for debugging
+            //https://futurestud.io/tutorials/picasso-cache-indicators-logging-stats
+            if(DEBUG) {
+                Picasso.with(mContext).setIndicatorsEnabled(true);
+                Picasso.with(mContext).setLoggingEnabled(true);
+            }
+            Logger.v("EMSA", "Picasso end load");
+            mImageView.bringToFront();              // Show image on top of text
+
+            Logger.v("EMSA",  "Image File URL: " + fileURL);
+            Logger.v("EMSA", "Number of image files: " + imageTextList.size());
 
             // Set timestamp view for image or set to current time if image hasn't loaded yet
+            Logger.v("EMSA", "Timestamping image start");
             String timestamp;
             try {
                 timestamp = new SimpleDateFormat(Util.TIMESTAMP_FORMAT).format(
@@ -288,9 +311,7 @@ public class EachMealSectionAdapter extends PagerAdapter {
                 timestamp = new SimpleDateFormat(Util.TIMESTAMP_FORMAT).format(time);
             }
             timeTextView.setText(timestamp);
-
-            uploadTextView.setText(R.string.loading_message);
-            mImageView.bringToFront();              // Show image on top of text
+            Logger.v("EMSA", "Timestamping image end");
         }
 
     }

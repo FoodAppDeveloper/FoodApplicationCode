@@ -24,7 +24,6 @@
             android:id="@+id/logout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
             android:text="@string/logout"
             android:textSize="20sp"/>
 
@@ -55,22 +54,37 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
+            android:layout_marginBottom="5dp"
             android:drawableLeft="@android:drawable/ic_menu_info_details"
             android:text="@string/help_title"
             android:textColor="@android:color/black"
             android:textSize="22sp" />
 
         <TextView
+            android:id="@+id/help_phone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/contact_info"
-            android:textSize="15sp"
+            android:text="@string/help_phone"
+            android:textSize="17sp"
             android:textColor="@android:color/black"
             android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"/>
+            android:layout_marginRight="10dp"
+            android:onClick="onClick"
+            android:clickable="true"/>
+
+        <TextView
+            android:id="@+id/help_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/help_email"
+            android:textSize="17sp"
+            android:textColor="@android:color/black"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:onClick="onClick"
+            android:clickable="true"/>
 
     </LinearLayout>
 

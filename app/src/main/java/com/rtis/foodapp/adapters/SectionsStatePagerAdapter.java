@@ -3,26 +3,29 @@ package com.rtis.foodapp.adapters;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.rtis.foodapp.ui.fragments.EachDayFragment;
+
+import android.view.ViewGroup;
 
 import java.util.List;
 
 /**
- * Created by rajul on 11/18/2016.
+ * Created by bmorris on 12/12/2018.
  */
 
 /**
- * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
- * one of the sections/tabs/pages.
+ * A {@link FragmentStatePagerAdapter} that returns a fragment corresponding to
+ * one of the sections/tabs/pages.  Use of FragmentStatePagerAdapter rather than FragmentPagerAdapter since the later has fixed size.  This means it should be better handling scrolling beyond the given week.
  */
-public class SectionsPagerAdapter extends FragmentPagerAdapter {
+public class SectionsStatePagerAdapter extends FragmentStatePagerAdapter {
 
     private List<String> swipeStrings = null;
     private List<String> dateStrings = null;
     private EachDayFragment currentFragment;
 
-    public SectionsPagerAdapter(FragmentManager fm) {
+    public SectionsStatePagerAdapter(FragmentManager fm) {
         super(fm);
     }
 
@@ -33,7 +36,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
      * @param swipeStrings List of Strings containing the name of the fragment
      * @param dateStrings List of Strings containing date of fragment
      */
-    public SectionsPagerAdapter(FragmentManager fm, List<String> swipeStrings, List<String> dateStrings) {
+    public SectionsStatePagerAdapter(FragmentManager fm, List<String> swipeStrings, List<String> dateStrings) {
         super(fm);
         //this.swipeStrings = swipeStrings;
         //this.dateStrings = dateStrings;
@@ -46,7 +49,6 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     }
 
     public List<String> getSwipeStrings() { return this.swipeStrings; }
-
     public List<String> getDateStrings() { return this.dateStrings; }
 
     @Override
@@ -54,9 +56,19 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         // getItem is called to instantiate the fragment for the given page.
         // Return a EachDayFragment (defined as a static inner class below).
         // return EachDayFragment.newInstance(position + 1);
+
+        //EachDayFragment edf = new EachDayFragment();
+        //edf.newInstance(swipeStrings.get(position), dateStrings.get(position));
+        //return edf;
         return EachDayFragment.newInstance(swipeStrings.get(position), dateStrings.get(position));
 
     }
+
+    /*@Override
+    public int getItemPosition (Object object) {
+
+        return POSITION_NONE;
+    }*/
 
     @Override
     public int getCount() {
@@ -65,7 +77,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        switch (position) {
+        /*switch (position) {
             case 0:
                 return "Monday";
             case 1:
@@ -82,5 +94,13 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
                 return "Sunday";
         }
         return null;
+        */
+        return swipeStrings.get(position);
     }
+
+    /*@Override
+    public Object instantiateItem(ViewGroup container, int position) {
+
+        return super.instantiateItem(container, position);
+    }*/
 }

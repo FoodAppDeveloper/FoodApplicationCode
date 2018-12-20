@@ -119,6 +119,7 @@ public class EachMealFragment extends Fragment {
         this.date = date;
         this.parentFragment = fragment;
         this.mealItem = item;
+        //Logger.v("EMF: queryImageText() setup");
         queryImageText();
     }
 
@@ -140,6 +141,7 @@ public class EachMealFragment extends Fragment {
             meal = getArguments().getString(ARG_MEAL);
         }
 
+        //Logger.v("EMF: queryImageText() onSaveInstanceState");
         queryImageText();
 
         currentPos = 0;
@@ -151,14 +153,13 @@ public class EachMealFragment extends Fragment {
 
         View customView = inflater.inflate(R.layout.captured_meal_popup, container,
                 false);
+        //Logger.v("EMF: queryImageText() start");
         queryImageText();
+        //Logger.v("EMF: queryImageText() end");
 
-        // Shows camera if no images associated with this meal, otherwise show images
-        if (!containsImages()) {
-            dispatchTakePictureIntent();
-        } else {
-            showPopUp();
-        }
+        //Logger.v("EMF: mealClicked() start");
+        mealClicked();
+        //Logger.v("EMF: mealClicked() end");
 
         return customView;
     }
@@ -228,7 +229,7 @@ public class EachMealFragment extends Fragment {
 
             @Override
             public void onPageSelected(int position) {
-                Log.v("Slider","Page Selected to "+position);
+                Log.v("EMF", "Slider: Page Selected to "+position);
                 currentPos = position;
                 swipeSelector.selectItemAt(position);
             }
@@ -281,7 +282,7 @@ public class EachMealFragment extends Fragment {
 
             } catch (IOException e) {
                 // Error occurred while creating the File
-                Util.showToast(getContext(), "Failed to capture image.");
+                Util.showToast(getContext(), "Failed to create local image file.");
             }
             // Continue only if the File was successfully created
             if (photoFile != null) {
@@ -297,9 +298,9 @@ public class EachMealFragment extends Fragment {
     }
 
     /**
-     * Helper method to create image file in storage.
+     * Helper method to create image file in storage.  Occurs after camera action to take picture.
      *
-     * @return
+     * @return File Image that has been taken
      * @throws IOException
      */
     private File createImageFile() throws IOException {
@@ -363,13 +364,19 @@ public class EachMealFragment extends Fragment {
     private void uploadImageFile(final int position) {
         String directory = Defaults.FILES_IMAGETEXT_DIRECTORY + "/"
                 + Backendless.UserService.CurrentUser().getEmail();
+
+        //[TODO] can we update size of image here at point of upload
+        Logger.v("EMF: Resize Start");
+        Util.resizeImage(mCurrentFile, 1024, true);
+        Logger.v("EMF: Resize End");
+        Logger.v("EMF: Upload Start");
         Backendless.Files.upload(mCurrentFile, directory, new AsyncCallback<BackendlessFile>() {
 
             @Override
             public void handleResponse(BackendlessFile backendlessFile) {
                 ImageText imageText = imageTextList.get(position);
                 imageText.setImageFile(backendlessFile.getFileURL());
-                Logger.v(" Image File Url " + backendlessFile.getFileURL());
+                Logger.v(" EMF: Image File Url " + backendlessFile.getFileURL());
                 imageTextList.set(position, imageText);
                 ImageText.saveImageText(imageText);
                 mCurrentFile.delete();
@@ -390,6 +397,7 @@ public class EachMealFragment extends Fragment {
             }
 
         });
+        Logger.v("EMF: Upload End");
     }
 
     /**
@@ -417,9 +425,9 @@ public class EachMealFragment extends Fragment {
         }
 
         /* Delete image file */
-        Backendless.Files.remove(fileName, new AsyncCallback<Void>() {
+        Backendless.Files.remove(fileName, new AsyncCallback<Integer>() {
             @Override
-            public void handleResponse(Void response) {
+            public void handleResponse(Integer response) {
                 Logger.v("Deleted Image File");
 
                 /* Delete text File if exists */
@@ -437,9 +445,9 @@ public class EachMealFragment extends Fragment {
                         return;
                     }
 
-                    Backendless.Files.remove(fileName, new AsyncCallback<Void>() {
+                    Backendless.Files.remove(fileName, new AsyncCallback<Integer>() {
                         @Override
-                        public void handleResponse(Void response) {
+                        public void handleResponse(Integer response) {
                             Logger.v("Deleted Text File");
 
                             // Finally, delete object
@@ -526,13 +534,13 @@ public class EachMealFragment extends Fragment {
                             if (mealItem != null) {
                                 mealItem.setFill(false);
                             }
-                            Logger.v(" No Image Files Queried.");
+                            //Logger.v(" No Image Files Queried.");
                         } else {
                             // set item view fill to true
                             if (mealItem != null) {
                                 mealItem.setFill(true);
                             }
-                            Logger.v(" Number of image files queried: " + itList.size());
+                            Logger.v("EMF:queryImageText()", "Backendless => Number of image files queried: " + itList.size());
                         }
 
                         // Update view
@@ -548,6 +556,7 @@ public class EachMealFragment extends Fragment {
                                 backendlessFault.getMessage());
                     }
                 });
+        //Logger.v("EMF:queryImageText()", "end (picture not updated yet)");
     }
 
     /**
