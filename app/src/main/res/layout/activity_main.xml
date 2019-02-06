@@ -30,8 +30,8 @@
                 app:swipe_indicatorInActiveColor="@color/swipeselector_color_indicator_inactive"
                 app:swipe_indicatorMargin="12dp"
                 app:swipe_indicatorSize="10dp"
-                app:swipe_leftButtonResource="@drawable/icons8_back_24"
-                app:swipe_rightButtonResource="@drawable/icons8_forward_24"
+                app:swipe_leftButtonResource="@null"
+                app:swipe_rightButtonResource="@null"
                 app:swipe_titleTextAppearance="@style/AppTheme.SwipeTitleAppearance">
 
                 <android.support.v4.view.ViewPager

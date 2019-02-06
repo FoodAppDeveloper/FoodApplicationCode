@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/FoodApplicationCode.iml" filepath="$PROJECT_DIR$/FoodApplicationCode.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/swipe-selector-release/swipe-selector-release.iml" filepath="$PROJECT_DIR$/swipe-selector-release/swipe-selector-release.iml" />
     </modules>
   </component>
 </project>

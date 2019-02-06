@@ -123,15 +123,13 @@ public class MainActivity extends AppCompatActivity{
                                 //update week +1
                                 weekOffset = weekOffset + 1;
                                 updateSwipeSelectorInfo(calendar, weekOffset, swipeStrings, dateStrings);
-                                //setSwipeItems(swipeStrings);
-                                //mViewPager.setCurrentItem(0); // set to index of Sun
+                                setSwipeItems(swipeStrings);
                                 newDay = 0;
                             } else if (firstDayWeekVisible) {
                                 //update week -1
                                 weekOffset = weekOffset - 1;
                                 updateSwipeSelectorInfo(calendar, weekOffset, swipeStrings, dateStrings);
-                                //setSwipeItems(swipeStrings);
-                                //mViewPager.setCurrentItem(finalDayWeek); // set to index of Sat
+                                setSwipeItems(swipeStrings);
                                 newDay = finalDayWeek;
                             }
                             //update the Section Pager Adapter
@@ -142,7 +140,7 @@ public class MainActivity extends AppCompatActivity{
                         lastScrollState = state;
 
                         SwipeItem selectedItem = swipeSelector.getSelectedItem();
-                        int value = (Integer) selectedItem.value;
+                        String value = selectedItem.getValue();
                         Log.v("MA:ScrollStateChanged()", "state= " + state + " currDay=" + currentDayOfWeek + " swipeSelector.Item=" + value + " " + swipeStrings.toString());
 
                     }
@@ -160,12 +158,12 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onItemSelected(SwipeItem item) {
 
-                int position = (Integer) item.value-1;
+                int position = Integer.parseInt(item.getValue())-1;
 
                 setDayVisibility(position);
-                //mViewPager.setCurrentItem(position);
+                mViewPager.setCurrentItem(position);
 
-                Log.v("MA:SwipeItemSelected()", "positions=" + position + " item= " + (Integer) item.value + " swipeSelector.Item=" + (Integer) swipeSelector.getSelectedItem().value);
+                Log.v("MA:SwipeItemSelected()", "positions=" + position + " item= " + (position+1) + " swipeSelector.Item=" + swipeSelector.getSelectedItem().getValue());
 
             }
         });
@@ -203,7 +201,7 @@ public class MainActivity extends AppCompatActivity{
                                     if(weekOffset!=0) {
                                         weekOffset = 0;
                                         updateSwipeSelectorInfo(calendar, weekOffset, swipeStrings, dateStrings);
-                                        //setSwipeItems(swipeStrings);
+                                        setSwipeItems(swipeStrings);
 
                                         //set views
                                         mSectionsPagerAdapter.updateStrings(swipeStrings, dateStrings);
@@ -252,17 +250,31 @@ public class MainActivity extends AppCompatActivity{
 
     public void setSwipeItems(List<String> swipeStrings) {
 
-        //create new swipe items every call
-        swipeSelector.setItems(
-                new SwipeItem(Util.MONDAY, swipeStrings.get(0), ""),
-                new SwipeItem(Util.TUESDAY, swipeStrings.get(1), ""),
-                new SwipeItem(Util.WEDNESDAY, swipeStrings.get(2), ""),
-                new SwipeItem(Util.THURSDAY, swipeStrings.get(3), ""),
-                new SwipeItem(Util.FRIDAY, swipeStrings.get(4), ""),
-                new SwipeItem(Util.SATURDAY, swipeStrings.get(5), ""),
-                new SwipeItem(Util.SUNDAY, swipeStrings.get(6), "")
-        );
-        System.gc();
+        int count = swipeSelector.getCount();
+
+        if(count==0) {
+            //create new swipe items every call
+            swipeSelector.setItems(
+                    new SwipeItem(String.valueOf(Util.MONDAY), swipeStrings.get(0), ""),
+                    new SwipeItem(String.valueOf(Util.TUESDAY), swipeStrings.get(1), ""),
+                    new SwipeItem(String.valueOf(Util.WEDNESDAY), swipeStrings.get(2), ""),
+                    new SwipeItem(String.valueOf(Util.THURSDAY), swipeStrings.get(3), ""),
+                    new SwipeItem(String.valueOf(Util.FRIDAY), swipeStrings.get(4), ""),
+                    new SwipeItem(String.valueOf(Util.SATURDAY), swipeStrings.get(5), ""),
+                    new SwipeItem(String.valueOf(Util.SUNDAY), swipeStrings.get(6), "")
+            );
+        }
+        else {
+            //update swipe items names
+            swipeSelector.setTitle(0, swipeStrings.get(0));
+            swipeSelector.setTitle(1, swipeStrings.get(1));
+            swipeSelector.setTitle(2, swipeStrings.get(2));
+            swipeSelector.setTitle(3, swipeStrings.get(3));
+            swipeSelector.setTitle(4, swipeStrings.get(4));
+            swipeSelector.setTitle(5, swipeStrings.get(5));
+            swipeSelector.setTitle(6, swipeStrings.get(6));
+
+        }
     }
 
     public void updateSwipeSelectorInfo(Calendar calendar, int weekOffset, List<String> swipeStrings, List<String> dateStrings) {

@@ -206,7 +206,7 @@ public class EachMealFragment extends Fragment {
         swipeSelector = (SwipeSelector) customView.findViewById(R.id.eachMealselector);
         SwipeItem[] swipeItems = new SwipeItem[imageTextList.size()];
         for (int i = 0; i < imageTextList.size(); i++) {
-            swipeItems[i] = new SwipeItem(i, "Image" + i, "Image" + i);
+            swipeItems[i] = new SwipeItem(String.valueOf(i), "Image" + i, "Image" + i);
         }
         swipeSelector.setItems(swipeItems);
 

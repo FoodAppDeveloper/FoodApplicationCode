@@ -37,11 +37,12 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
+        Logger.v("Splash", "Initialize Backendless");
         Backendless.setUrl(Defaults.SERVER_URL);
         //Backendless.initApp(this, Defaults.APPLICATION_ID, Defaults.SECRET_KEY, Defaults.VERSION);
         Backendless.initApp(getApplicationContext(), Defaults.APPLICATION_ID, Defaults.API_KEY);
 
-        // Logger.v(" Splash On Create ");
+        Logger.v("Splash", " Splash On Create ");
         init();
 
 

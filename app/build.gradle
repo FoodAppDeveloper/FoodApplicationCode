@@ -6,14 +6,19 @@ android {
         applicationId "com.rtis.foodapp"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "2.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
             minifyEnabled false  // Enables code shrinking for release build
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
+            //applicationIdSuffix ".debug"
+            debuggable true
         }
     }
 }
@@ -28,13 +33,16 @@ dependencies {
     implementation 'com.android.support:design:25.1.0'
     implementation 'com.google.android.gms:play-services:9.8.0'
     implementation 'com.roughike:bottom-bar:2.0.2'
-    implementation 'com.roughike:swipe-selector:1.0.6'
+    //implementation 'com.roughike:swipe-selector:1.0.6'
     //implementation project(":swipe-selector")    //run local copy of swipe-selector
+    //debugImplementation project(":swipe-selector-debug")
+    //releaseImplementation project(":swipe-selector-release")
+    implementation project(":swipe-selector-release")
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation 'com.android.support:support-v4:25.1.0'
     testImplementation 'junit:junit:4.12'
     //implementation 'com.backendless:backendless:5.0.+'
-    implementation 'com.backendless:backendless:5.0.+'
+    implementation 'com.backendless:backendless:5.2.2'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     // required for real-time database and real-time messaging
     implementation('io.socket:socket.io-client:1.0.0') {

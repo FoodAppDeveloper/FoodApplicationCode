@@ -93,6 +93,7 @@ public class EachDayFragment extends Fragment {
 
         // Populate MealTimeItems list
         myList = (RecyclerView) rootView.findViewById(R.id.myList);
+
         mItems = new ArrayList<>();
         mItems.add(new MealTimeItems(Util.BREAKFAST_STRING));           // 0
         mItems.add(new MealTimeItems(Util.MORNING_SNACK_STRING));       // 1

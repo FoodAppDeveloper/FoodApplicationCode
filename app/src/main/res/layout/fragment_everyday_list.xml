@@ -7,9 +7,13 @@
         android:id="@+id/myList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="0dp"
+        android:clipChildren="true"
         android:clipToPadding="false"
-        android:padding="@dimen/item_offset"
-        >
-    </android.support.v7.widget.RecyclerView>
+        android:nestedScrollingEnabled="false"
+        android:overScrollMode="never"
+        android:padding="@dimen/item_offset"></android.support.v7.widget.RecyclerView>
 
 </RelativeLayout>
