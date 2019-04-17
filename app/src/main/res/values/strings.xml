@@ -50,7 +50,7 @@
     <string name="help_phone">Call: 702&#8211;895&#8211;5746</string>
     <string name="help_phone_uri">tel:6199130909</string>
     <string name="help_email">Email: foodappdevelopers@gmail.com</string>
-    <string name="help_email_uri">foodappdevelopers@gmail.com</string>
+    <string name="help_email_uri">mailto:foodappdevelopers@gmail.com</string>
     <string name="rate">Rate us! </string>
     <string name="tips">Tips</string>
     <string name="today">Today</string>
