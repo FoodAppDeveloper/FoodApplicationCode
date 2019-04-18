@@ -16,8 +16,8 @@
         app:swipe_indicatorInActiveColor="@color/swipeselector_color_indicator_inactive"
         app:swipe_indicatorMargin="12dp"
         app:swipe_indicatorSize="10dp"
-        app:swipe_leftButtonResource="@drawable/icons8_back_24"
-        app:swipe_rightButtonResource="@drawable/icons8_forward_24"
+        app:swipe_leftButtonResource="@null"
+        app:swipe_rightButtonResource="@null"
         android:padding="5dp"
         android:layout_below="@id/delete_button"
        >
@@ -42,7 +42,8 @@
         android:adjustViewBounds="false"
         android:cropToPadding="false"
         android:scaleType="centerCrop"
-        android:src="@android:drawable/ic_menu_camera" />
+        android:src="@android:drawable/ic_menu_camera"
+        android:contentDescription="@null" />
 
     <ImageButton
         android:id="@+id/close_popup"
@@ -50,7 +51,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:src="@drawable/ic_close_dark" />
+        android:src="@android:drawable/ic_menu_camera"
+        android:contentDescription="@null" />
 
     <ImageButton
         android:id="@+id/delete_button"
@@ -58,6 +60,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:src="@android:drawable/ic_menu_delete" />
+        android:src="@android:drawable/ic_menu_delete"
+        android:contentDescription="@null" />
 
 </RelativeLayout>

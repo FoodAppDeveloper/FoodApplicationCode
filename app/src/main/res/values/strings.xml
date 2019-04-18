@@ -46,9 +46,9 @@
     <!--Settings Page-->
     <string name="logout">Logout</string>
     <string name="help_title">Help and Support</string>
-    <string name="contact_info">Call: 702-895-5746\nEmail: foodappdevelopers@gmail.com</string>
-    <string name="help_phone">Call: 702&#8211;895&#8211;5746</string>
-    <string name="help_phone_uri">tel:6199130909</string>
+    <string name="contact_info">Call: 702-895-5745\nEmail: foodappdevelopers@gmail.com</string>
+    <string name="help_phone">Call: 702&#8211;895&#8211;5745</string>
+    <string name="help_phone_uri">tel:7028955745</string>
     <string name="help_email">Email: foodappdevelopers@gmail.com</string>
     <string name="help_email_uri">mailto:foodappdevelopers@gmail.com</string>
     <string name="rate">Rate us! </string>

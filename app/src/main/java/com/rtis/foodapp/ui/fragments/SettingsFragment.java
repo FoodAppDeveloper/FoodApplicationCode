@@ -103,7 +103,7 @@ public class SettingsFragment extends Fragment {
      * Helper method to handle phone call
      */
     private void helpEmail() {
-        //Uri email = Uri.parse((String) getText(R.string.help_email_uri));
+        Uri email = Uri.parse((String) getText(R.string.help_email_uri));
         Intent emailIntent = new Intent(Intent.ACTION_SEND);
         emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {(String) getText(R.string.help_email_uri)});
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "MySnapFoodLog: Support Request");
